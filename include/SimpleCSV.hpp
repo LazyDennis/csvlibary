@@ -33,7 +33,7 @@ namespace SimpleCSV
         const str_t &operator[](const str_t &fieldname) const; //如果没有找到表头对应字串值，抛出std::invalid_argumnent异常。
         index_t get_rownum() const noexcept { return row; }
 
-        const csvrow &readrow(index_t row_no, const csv &c, std::ifstream &ifile, std::ifstream &(*newline)(std::ifstream &is, str_t &str) = getnewline);
+        const csvrow &readrow(index_t row_no, const csv &c, std::ifstream &ifile);
     };
 
     class csv : public vector<csvrow>
@@ -108,7 +108,7 @@ namespace SimpleCSV
             index_t row = 0, loadedline = 0;
             do
             {
-                arr_tmp.readrow(row, *this, ifile, getnewline);
+                arr_tmp.readrow(row, *this, ifile);
 
                 if (header == n_index || loadedline++ >= header) //如果header == n_index，为没有header的情况，每一行都被读入；如果loadedline >= header，可以读入余下的行。
                     this->push_back(arr_tmp);
@@ -186,14 +186,14 @@ namespace SimpleCSV
         throw std::invalid_argument(fieldname + " not found");
     }
 
-    const csvrow &csvrow::readrow(index_t row_no, const csv &c, std::ifstream &ifile, std::ifstream &(*newline)(std::ifstream &is, str_t &str))
+    const csvrow &csvrow::readrow(index_t row_no, const csv &c, std::ifstream &ifile)
     {
         bool endline_flag = false;
         str_t str_src, str_tmp;
         str_t::iterator it1, it2;
         do
         {
-            newline(ifile, str_src);
+            getline(ifile, str_src);
             if (endline_flag)
                 str_src = str_tmp + str_src; //如果内容包含换行，则添加上换行前的内容
             it1 = it2 = str_src.begin();
