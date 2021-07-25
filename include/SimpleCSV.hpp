@@ -17,8 +17,10 @@ namespace SimpleCSV
     const char DFL_QUOTE_CHAR = '\"';
 
     class csv;
-    std::ifstream &getnewline(std::ifstream &ifs, str_t &str) noexcept;
 
+    bool equal_delimeter(str_t::const_iterator it, const str_t &deli) noexcept;
+
+    //SECTION: class csvrow definition.
     class csvrow : public vector<str_t>
     {
     private:
@@ -29,24 +31,26 @@ namespace SimpleCSV
         using vector<str_t>::vector;
         using vector::operator[];
 
-        str_t &operator[](const str_t &fieldname);             //如果没有找到表头对应字串值，抛出std::invalid_argumnent异常。
-        const str_t &operator[](const str_t &fieldname) const; //如果没有找到表头对应字串值，抛出std::invalid_argumnent异常。
+        str_t &operator[](const str_t &fieldname);             //如果没有找到表头对应字串值，抛出std::invalid_argumnent异常
+        const str_t &operator[](const str_t &fieldname) const; //如果没有找到表头对应字串值，抛出std::invalid_argumnent异常
         index_t get_rownum() const noexcept { return row; }
 
         const csvrow &readrow(index_t row_no, const csv &c, std::ifstream &ifile);
     };
 
+    //SECTION:  class csv definition
     class csv : public vector<csvrow>
     {
     public:
         static const index_t n_index = -1;
+        class csv_exception;
 
     private:
         str_t filename;
         str_t delimeter;     //分隔符，默认 ","，支持多字符
         char quote_char;     //转义字符
-        index_t header;      //读入文件的第header行为表头，-1时为无表头，默认0（第一行）,第header行前的数据会被丢弃。
-        index_t header_size; //header的烈数
+        index_t header;      //读入文件的第header行为表头，-1时为无表头，默认0（第一行）,第header行前的数据会被丢弃
+        index_t header_size; //header的列数
         friend csvrow;
 
         class csv_exception : public std::ios_base::failure
@@ -99,6 +103,94 @@ namespace SimpleCSV
         friend std::ostream &operator<<(std::ostream &os, const csv &c) noexcept;
     };
 
+    //SECTION: class csvrown methods implemetation
+    str_t &csvrow::operator[](const str_t &fieldname)
+    {
+        auto it = this - row;
+        index_t index;
+        for (index = 0; index < this->size(); ++index)
+        {
+            if ((*it)[index] == fieldname)
+                return (*this)[index];
+        }
+        throw std::invalid_argument(fieldname + " not found");
+    }
+
+    const str_t &csvrow::operator[](const str_t &fieldname) const
+    {
+        auto it = this - row;
+        index_t index;
+        for (index = 0; index < this->size(); ++index)
+        {
+            if ((*it)[index] == fieldname)
+                return (*this)[index];
+        }
+        throw std::invalid_argument(fieldname + " not found");
+    }
+
+    const csvrow &csvrow::readrow(index_t row_no, const csv &c, std::ifstream &ifile)
+    {
+        bool endline_flag = false;
+        str_t str_src, str_tmp;
+        str_t::iterator it1, it2;
+        do
+        {
+            getline(ifile, str_src);
+            if (endline_flag)
+                str_src = str_tmp + str_src; //如果内容包含换行，则添加上换行前的内容
+            it1 = it2 = str_src.begin();
+            while (it1 != str_src.end()) //对读入行进行处理
+            {
+                if (*it1 == c.quote_char)
+                {
+                    ++it1;
+                    it2 = it1;
+                    if (endline_flag)
+                    {
+                        it2 += (str_tmp.size() - 1); //直接从换行后的内容开始，
+                        endline_flag = false;        //对换行内容处理完毕
+                    }
+                    while (!(*it2 == c.quote_char && (equal_delimeter(it2 + 1, c.delimeter) || it2 >= str_src.end() - 1))) // 当前字节为quote_char且下一部分为delimeter或字符结束，说明字符已结束
+                    {
+                        if (*it2 == c.quote_char && *(it2 + 1) == c.quote_char)
+                            str_src.erase(it2);
+                        if (it2 >= str_src.end() - 1) // 内容中存在换行
+                        {
+                            str_tmp = c.quote_char + str_t(it1, it2 + 1) + '\n'; //已处理的内容临时存放于于str_tmp中
+                            endline_flag = true;                                 //设置换行标记
+                            break;
+                        }
+                        ++it2;
+                    }
+                }
+                else
+                {
+                    it2 = it1;
+                    auto en = str_src.find(c.delimeter, it1 - str_src.begin());
+                    if (~en)
+                        it2 = str_src.begin() + en;
+                    else
+                        it2 = str_src.end();
+                }
+                if (!endline_flag)
+                {
+                    emplace_back(it1, it2);
+                }
+                it1 = it2 + (it2 != str_src.end()) + (*it2 == c.quote_char && equal_delimeter(it2 + 1, c.delimeter)) * c.delimeter.size();
+            }
+        } while (endline_flag);
+
+        row = row_no;
+
+        while (row && size() < c.header_size) //列数不足时，追加空字符列至与表头相等
+        {
+            emplace_back("");
+        }
+
+        return *this;
+    }
+
+    //SECTION: class csv method implementation
     void csv::read()
     {
         std::ifstream ifile(filename);
@@ -110,10 +202,10 @@ namespace SimpleCSV
             {
                 arr_tmp.readrow(row, *this, ifile);
 
-                if (header == n_index || loadedline++ >= header) //如果header == n_index，为没有header的情况，每一行都被读入；如果loadedline >= header，可以读入余下的行。
+                if (header == n_index || loadedline++ >= header) //如果header == n_index，为没有header的情况，每一行都被读入；如果loadedline >= header，可以读入余下的行
                     this->push_back(arr_tmp);
 
-                if (size() == 1 && ~header) //如果csv中只有一个元素（只有一行），且header存在，则该行为header，该行的列数为全表列数，其行与其对齐。
+                if (size() == 1 && ~header) //如果csv中只有一个元素（只有一行），且header存在，则该行为header，该行的列数为全表列数，其行与其对齐
                     header_size = arr_tmp.size();
 
                 arr_tmp.clear();
@@ -162,92 +254,7 @@ namespace SimpleCSV
         return n_index;
     }
 
-    str_t &csvrow::operator[](const str_t &fieldname)
-    {
-        auto it = this - row;
-        index_t index;
-        for (index = 0; index < this->size(); ++index)
-        {
-            if ((*it)[index] == fieldname)
-                return (*this)[index];
-        }
-        throw std::invalid_argument(fieldname + " not found");
-    }
-
-    const str_t &csvrow::operator[](const str_t &fieldname) const
-    {
-        auto it = this - row;
-        index_t index;
-        for (index = 0; index < this->size(); ++index)
-        {
-            if ((*it)[index] == fieldname)
-                return (*this)[index];
-        }
-        throw std::invalid_argument(fieldname + " not found");
-    }
-
-    const csvrow &csvrow::readrow(index_t row_no, const csv &c, std::ifstream &ifile)
-    {
-        bool endline_flag = false;
-        str_t str_src, str_tmp;
-        str_t::iterator it1, it2;
-        do
-        {
-            getline(ifile, str_src);
-            if (endline_flag)
-                str_src = str_tmp + str_src; //如果内容包含换行，则添加上换行前的内容
-            it1 = it2 = str_src.begin();
-            while (it1 != str_src.end()) //对读入行进行处理
-            {
-                if (*it1 == c.quote_char)
-                {
-                    ++it1;
-                    it2 = it1;
-                    if (endline_flag)
-                    {
-                        it2 += (str_tmp.size() - 1); //直接从换行后的内容开始，
-                        endline_flag = false;        //对换行内容处理完毕
-                    }
-                    while (!(*it2 == c.quote_char && (str_t(it2 + 1, it2 + 1 + c.delimeter.size()) == c.delimeter || it2 >= str_src.end() - 1))) // 当前字节为quote_char且下一部分为delimeter或字符结束，说明字符已结束。
-                    {
-                        if (*it2 == c.quote_char && *(it2 + 1) == c.quote_char)
-                            str_src.erase(it2);
-                        if (it2 >= str_src.end() - 1) // 内容中存在换行
-                        {
-                            str_tmp = c.quote_char + str_t(it1, it2 + 1) + '\n'; //已处理的内容临时存放于于str_tmp中
-                            endline_flag = true;                                 //设置换行标记
-                            break;
-                        }
-                        ++it2;
-                    }
-                }
-                else
-                {
-                    it2 = it1;
-                    auto en = str_src.find(c.delimeter, it1 - str_src.begin());
-                    if (~en)
-                        it2 = str_src.begin() + en;
-                    else
-                        it2 = str_src.end();
-                }
-                if (!endline_flag)
-                {
-                    push_back(str_t(it1, it2));
-                }
-                it1 = it2 + (it2 != str_src.end()) + (*it2 == c.quote_char && str_t(it2 + 1, it2 + 1 + c.delimeter.size()) == c.delimeter) * (c.delimeter.size());
-            }
-        } while (endline_flag);
-
-        row = row_no;
-
-        while (row && size() < c.header_size) //列数不足时，追加空字符列至与表头相等
-        {
-            push_back(str_t(""));
-        }
-
-        return *this;
-    }
-
+    //SECTION: other non member mothods
     std::ostream &operator<<(std::ostream &os, const csv &c) noexcept
     {
         bool has_special_char = false;
@@ -264,11 +271,10 @@ namespace SimpleCSV
                 {
                     if (*it == c.quote_char)
                     {
-                        str_tmp.insert(it, c.quote_char);
-                        ++it;
+                        it = str_tmp.insert(it, c.quote_char) + 1;
                         has_special_char = true;
                     }
-                    if (str_t(it, it + c.delimeter.size()) == c.delimeter || *it == '\n')
+                    if (equal_delimeter(it, c.delimeter) || *it == '\n')
                         has_special_char = true;
                 }
                 if (has_special_char)
@@ -284,10 +290,12 @@ namespace SimpleCSV
         return os;
     }
 
-    std::ifstream &getnewline(std::ifstream &ifs, str_t &str) noexcept
+    bool equal_delimeter(str_t::const_iterator it, const str_t &deli) noexcept
     {
-        getline(ifs, str);
-        return ifs;
+        auto itdeli = deli.begin();
+        while (*it == *itdeli)
+            it++, itdeli++;
+        return (itdeli == deli.end());
     }
 
 }
