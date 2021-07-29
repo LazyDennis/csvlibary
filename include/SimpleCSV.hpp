@@ -68,7 +68,6 @@ namespace SimpleCSV
     {
     public:
         static const index_t n_index = -1;
-        // class csv_exception;
 
     private:
         index_t header;    //读入文件的第header行为表头，-1时为无表头，默认0（第一行）,第header行前的数据会被丢弃
@@ -78,16 +77,6 @@ namespace SimpleCSV
         char quote_char;   //转义字符
         char newline;      //换行符
         friend csvrow;
-
-        // class csv_exception : public std::ios_base::failure
-        // {
-        // private:
-        //     str_t err_message;
-
-        // public:
-        //     csv_exception(const str_t &err) noexcept : err_message(err), failure("") {}
-        //     const char *what() const noexcept { return err_message.data(); }
-        // };
 
     public:
         using vector<csvrow>::vector;
