@@ -2,6 +2,7 @@
  *          Simple CSV Master
  *          21年7月29日 21：47
  *          v0.0.1  正式版
+ *          v0.0.2  修改了Format(CsvFomat _format)读入时的规则
  */
 
 #ifndef _CSV_HPP_
@@ -112,7 +113,7 @@ namespace SimpleCSV
 
     //SECTION: class CsvRow method implementation
 
-    bool CsvRow::IsDeli(StrT::const_iterator _it, const StrT &_deli) const noexcept
+    inline bool CsvRow::IsDeli(StrT::const_iterator _it, const StrT &_deli) const noexcept
     {
         auto itDeli = _deli.begin();
         while (*_it == *itDeli)
@@ -128,7 +129,12 @@ namespace SimpleCSV
         if (Format_.Quote_ == 0 ||
             Format_.Delimeter_.size() < 2 &&
                 Format_.Delimeter_.front() == Format_.Quote_)
-            Format_.Quote_ = DFL_QUOTE;
+        {
+            if (Format_.Quote_ == DFL_QUOTE)
+                Format_.Delimeter_ = DFL_DELI;
+            else
+                Format_.Quote_ = DFL_QUOTE;
+        }
         Format_.Endline_ = DFL_ENDLINE;
     }
 
@@ -142,7 +148,12 @@ namespace SimpleCSV
         if (Format_.Quote_ == 0 ||
             Format_.Delimeter_.size() < 2 &&
                 Format_.Delimeter_.front() == Format_.Quote_)
-            Format_.Quote_ = DFL_QUOTE;
+        {
+            if (Format_.Quote_ == DFL_QUOTE)
+                Format_.Delimeter_ = DFL_DELI;
+            else
+                Format_.Quote_ = DFL_QUOTE;
+        }
         Format_.Endline_ = DFL_ENDLINE;
     }
 
