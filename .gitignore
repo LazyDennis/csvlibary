@@ -4,3 +4,5 @@ bin/test.exe
 bin/test.ilk
 bin/test.pdb
 test.obj
+plan.txt
+.gitignore
