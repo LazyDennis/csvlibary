@@ -3,7 +3,7 @@
  *          21年7月29日 21：47
  *          v0.0.1  正式版
  *          v0.0.2  修改了Format(CsvFomat _format)读入时的规则
- *          v0.0.3  模板化CsvRow及CsvTable类
+ *          v0.1.0  模板化CsvRow及CsvTable类
  */
 
 #ifndef _CSV_HPP_
