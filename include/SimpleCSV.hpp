@@ -1,9 +1,11 @@
 /*
  *          Simple CSV Master
- *          21年7月29日 21：47
+ *          
  *          v0.0.1  正式版
  *          v0.0.2  修改了Format(CsvFomat _format)读入时的规则
  *          v0.1.0  模板化CsvRow及CsvTable类
+ *          v0.1.1  去掉了BasicCsvRow及BasicCsvTable析构函数中显式调用std::vector()::~vector()的部分
+ * 
  */
 
 #ifndef _CSV_HPP_
@@ -88,7 +90,10 @@ namespace SimpleCSV
     public:
         using vector<std::basic_string<CharT>>::vector;
 
-        BasicCsvRow() : vector<std::basic_string<CharT>>(), Range_(CsvRange()), Format_(CsvFormat<CharT>()) {}
+        BasicCsvRow()
+            : vector<std::basic_string<CharT>>(),
+              Range_(CsvRange()),
+              Format_(CsvFormat<CharT>()) {}
         BasicCsvRow(const CsvRange &_range,
                     const CsvFormat<CharT> &_format) noexcept
             : vector<std::basic_string<CharT>>(),
@@ -96,17 +101,12 @@ namespace SimpleCSV
         {
             Format(_format);
         }
-        ~BasicCsvRow() noexcept { vector<std::basic_string<CharT>>::~vector(); }
+        ~BasicCsvRow() noexcept {}
 
         void Range(const CsvRange &_range) noexcept { Range_ = _range; }
         void Format(const CsvFormat<CharT> &_format) noexcept;
         const CsvRange &Range() const noexcept { return Range_; }
         const CsvFormat<CharT> &Format() const noexcept { return Format_; }
-
-        // template <CharT>
-        // friend std::basic_istream<CharT> &operator>>(std::basic_istream<CharT> &is, BasicCsvRow<CharT> &_csvrow);
-        // template <CharT>
-        // friend std::basic_ostream<CharT> &operator<<(std::basic_ostream<CharT> &os, const BasicCsvRow<CharT> &_csvrow);
     };
 
     //SECTION:  class BasicCsvTable definition
@@ -123,7 +123,7 @@ namespace SimpleCSV
         using vector<BasicCsvRow<CharT>>::vector;
         BasicCsvTable() : vector<BasicCsvRow<CharT>>(), Range_(CsvRange()), Format_(CsvFormat<CharT>()) {}
         BasicCsvTable(const CsvRange &_range, const CsvFormat<CharT> &_format) noexcept : vector<BasicCsvRow<CharT>>(), Range_(_range) { Format(_format); }
-        ~BasicCsvTable() { vector<BasicCsvRow<CharT>>::~vector(); }
+        ~BasicCsvTable() noexcept {}
 
         void Range(const CsvRange &_range) noexcept { Range_ = _range; }
         void Format(const CsvFormat<CharT> &_format) noexcept;
@@ -138,11 +138,6 @@ namespace SimpleCSV
         IndexT Rows() const noexcept { return vector<BasicCsvRow<CharT>>::size(); } //返回行数
         IndexT Columns() const noexcept { return Columns_; }                        //返回列数
         void Columns(IndexT _Columns) { Columns_ = _Columns; }
-
-        // template <CharT>
-        // friend std::basic_istream<CharT> &operator>>(std::basic_istream<CharT> &is, BasicCsvTable<CharT> &_CsvTable);
-        // template <CharT>
-        // friend std::basic_ostream<CharT> &operator<<(std::basic_ostream<CharT> &os, const BasicCsvTable<CharT> &_CsvTable);
     };
 
     //SECTION: class BasicCsvRow method implementation

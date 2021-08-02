@@ -235,3 +235,7 @@ To change `value2`, you can do as below:
 ```c++
     csvtest[1][csvtest.HeadIndex("column2")] = "value7";
 ```
+
+## License
+
+This project is licensed under the terms of the MIT license.
