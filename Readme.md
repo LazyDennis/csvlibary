@@ -6,8 +6,16 @@ This is a CSV(Comma-Separated Values) libary for simply use of reading / writing
 
 ## Description
 
-This is a CSV libary written by `C++`. It can be used to read or write CSV files. By inheriting `vector` class for `C++` standard libary, there are to main classes in the libary, included in namespace `SimpleCSV`. I am going show how to use the libary below.
+This is a CSV libary written by `C++`. It can be used to read or write CSV files. By inheriting `std::vector` class of `C++` standard libary, there are two main classes in the libary, included in namespace `SimpleCSV`. I am going show how to use the libary below.
 Delimeter and escape character can be customized, and `','` as delimeter , `'\"'` as escape character and `'\n'` as newline, are set as default. Multiple charactors of delimeter is supported in this libary.
+
+---
+
+## Features
+
+1. C++11 standard is required.
+2. Using template to support different types of character.
+3. Methods of `std::vector` can be used to operator rows and elements, also STL algorithm.
 
 ---
 
@@ -22,8 +30,7 @@ The whole libary is included in Namespace `SimpleCSV`. You may need to use the l
 The following variable is defined in the libary:
 
 ```c++
-    typedef std::string StrT;
-    typedef size_t IndexT;
+   typedef size_t IndexT;   // used to define varaible of rows and columns
 ```
 
 Tow struct are also be defined:
@@ -36,11 +43,12 @@ Tow struct are also be defined:
         IndexT Index_;
         IndexT CountColumns_;
     };
+    template <typename CharT>
     struct CsvFormat
     {
-        StrT Delimeter_;
-        char Quote_;
-        char Endline_;
+        std::basic_string<CharT> Delimeter_;
+        CharT Quote_;
+        CharT Endline_;
     };
 
 ```
@@ -52,10 +60,14 @@ Tow struct are also be defined:
 Four Gobal variable in the namespace are defined as below:
 
 ```c++
-    static const IndexT nIndex = -1;
-    const StrT DFL_DELI = ",";
-    const char DFL_QUOTE = '\"';
-    const char DFL_ENDLINE = '\n';
+    static const IndexT nIndex = -1;  // Maxiumn of rows and columns
+    template <typename CharT>
+    const std::basic_string<CharT> DFL_DELI{(CharT)','};
+    template <typename CharT>
+    const CharT DFL_QUOTE = (CharT)'\"';
+    template <typename CharT>
+    const CharT DFL_ENDLINE = (CharT)'\n';
+
 ```
 
 ### Main Class
@@ -63,18 +75,29 @@ Four Gobal variable in the namespace are defined as below:
 Two main class is defined in the libary as:
 
 ```c++
-    class CsvRow : public vector<StrT>
+    template <typename CharT>
+    class BasicCsvRow : public vector<std::basic_string<CharT>>
 ```
 
 A class to record one row of a CSV table.
 
 ```c++
-    class CsvTalbe : public vector<CsvRow>
+    template <typename CharT>
+    class BasicCsvTable : public vector<BasicCsvRow<CharT>>
 ```
 
 A class to record a CSV table, which is combined by CsvRow(s).
 
 By inheriting `vector` class, the member function of vector is also able to be used directly.
+
+Each class is specialized as:
+
+```cpp
+    using CsvRow = BasicCsvRow<char>;
+    using wCsvRow = BasicCsvRow<wchar_t>;
+    using CsvTable = BasicCsvTable<char>;
+    using wCsvTable = BasicCsvTable<wchar_t>;
+```
 
 ### Public Methods
 
@@ -82,15 +105,15 @@ Public methods are as below
 
 #### struct CsvRange
 
-| Method                                                                                                        | Usage                                                 |
-| :------------------------------------------------------------------------------------------------------------ | :---------------------------------------------------- |
-| `CsvRange(IndexT _header = 0, IndexT _CountRows = nIndex, IndexT _index = 0, IndexT _CountColumns = nIndex);` | Defaul construtor to construct a variable of CsvRange |
+| Method                                                                                                        | Usage                                                  |
+| :------------------------------------------------------------------------------------------------------------ | :----------------------------------------------------- |
+| `CsvRange(IndexT _header = 0, IndexT _CountRows = nIndex, IndexT _index = 0, IndexT _CountColumns = nIndex);` | Default construtor to construct a variable of CsvRange |
 
 #### struct Format
 
-| Method                                                            | Usage                                                    |
-| :---------------------------------------------------------------- | :------------------------------------------------------- |
-| `CsvFormat(StrT _delimeter = DFL_DELI, char _quote = DFL_QUOTE);` | Default construtor to construct a variable of CsvFormmat |
+| Method                                                            | Usage                                                     |
+| :---------------------------------------------------------------- | :-------------------------------------------------------- |
+| `CsvFormat(StrT _delimeter = DFL_DELI, char _quote = DFL_QUOTE);` | Default constructor to construct a variable of CsvFormmat |
 
 #### class CsvRow
 
@@ -105,10 +128,10 @@ Public methods are as below
 
 ##### 2. Non member methods
 
-| Method                                                              | Usage                                      |
-| :------------------------------------------------------------------ | :----------------------------------------- |
-| `std::istream &operator>>(std::istream &is, CsvRow &_csvrow)`       | Easily used to read a row of a CSV table.  |
-| `std::ostream &operator<<(std::ostream &os, const CsvRow &_csvrow)` | Easily used to write a row to a CSV table. |
+| Method                                                                                                                              | Usage                                     |
+| :---------------------------------------------------------------------------------------------------------------------------------- | :---------------------------------------- |
+| `template <typename CharT> std::basic_istream<CharT> &operator>>(std::basic_istream<CharT> &is, BasicCsvRow<CharT> &_csvrow)`       | Easily used to read a row of a CSV file.  |
+| `template <typename CharT> std::basic_ostream<CharT> &operator<<(std::basic_ostream<CharT> &os, const BasicCsvRow<CharT> &_csvrow)` | Easily used to write a row to a CSV file. |
 
 #### class CsvTable
 
@@ -127,12 +150,14 @@ Public methods are as below
 
 ##### 2. Non member methods
 
-| Method                                                                   | Usage                             |
-| :----------------------------------------------------------------------- | :-------------------------------- |
-| `std::istream &operator>>(std::istream &is, CsvTable &\_CsvTable)`       | Easily used to read a CSV table.  |
-| `std::ostream &operator<<(std::ostream &os, const CsvTable &\_CsvTable)` | Easily used to write a CSV table. |
+| Method                                                                                                                                  | Usage                            |
+| :-------------------------------------------------------------------------------------------------------------------------------------- | :------------------------------- |
+| `template <typename CharT> std::basic_istream<CharT> &operator>>(std::basic_istream<CharT> &is, BasicCsvTable<CharT> &_CsvTable)`       | Easily used to read a CSV file.  |
+| `template <typename CharT> std::basic_ostream<CharT> &operator<<(std::basic_ostream<CharT> &os, const BasicCsvTable<CharT> &_CsvTable)` | Easily used to write a CSV file. |
 
-### Usage
+---
+
+## Usage
 
 #### 1. Reading and writing a csv file.
 
@@ -159,15 +184,15 @@ You may also use `std::cout` to show a row of a table in the console like below:
 Data is seperated usually by a comma(`','`) in a CSV file. And a quote(`'\"'`) as an escape charater. There would be special files sometimes, however, such as TSV(Tab-seperated Value). You can define a variable by using `struct CsvFormat` to change the this kind of properties to process the special files.
 
 ```c++
-    SimpleCSV::CsvFormat formattest("\t"); //for TSV files
+    SimpleCSV::CsvFormat<char> formattest("\t"); //for TSV files
     SimpleCSV::CsvTable csvtest;
     csvtest.format(formattest);
 ```
 
 ```c++
-    SimpleCSV::CsvFormat formattest1; //for special uses
-    formattest1.Delimeter_ = "::";
-    formattest1.Quote_ = '\\';
+    SimpleCSV::CsvFormat<wchar_t> formattest1; //for special uses
+    formattest1.Delimeter_ = L"::";
+    formattest1.Quote_ = L'\\';
 ```
 
 Note:
@@ -177,6 +202,23 @@ Note:
 - `Delimeter_`and `Quote_` should not be the same charater. If set as the same, `Quote_` would be set to default. And if the `Quote_` already equals `DFL_QUOTE`, `Delimeter_` would be set to default.
 
 #### 3. Setting read-range when reading a CSV file.
+
+You can only read specified rows and columns from a CSV file, by using a `struct CsvRange`.
+
+```c++
+    SimpleCSV::CsvRange csvrange1(2, 5, 3, 6);
+    csvtest.range(csvrange1);
+```
+
+There are for elements in `struct CsvRange`.
+| elements | meanings
+| --- | ---- |
+| Header* | the starting row to be read |
+|CountRows* | the number of rows to be read from starting row|
+| Index* | the starting column to be read |
+| CountColumns* | the number of columns to be read from starting columns |
+
+The sample above means read **5** rows from **2nd** row and **6** columns from **3rd** column, from a CSV file.
 
 #### 4. Operate a specified cell of the table
 
