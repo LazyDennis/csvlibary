@@ -5,11 +5,13 @@
  *          v0.0.2  修改了Format(CsvFomat _format)读入时的规则
  *          v0.1.0  模板化CsvRow及CsvTable类
  *          v0.1.1  去掉了BasicCsvRow及BasicCsvTable析构函数中显式调用std::vector()::~vector()的部分
+ *          v0.1.2  排除空行；修改BasicCsvTable的CsvFormat后修改所有内部CsvRow的Format属性；补齐或修剪
+ *                  列数使与表头相等
  * 
  */
 
-#ifndef _CSV_HPP_
-#define _CSV_HPP_
+#ifndef __SIMPLECSV_HPP
+#define __SIMPLECSV_HPP
 #include <string>
 #include <vector>
 #include <fstream>
@@ -178,6 +180,8 @@ namespace SimpleCSV
                 Format_.Quote_ = DFL_QUOTE<CharT>;
         }
         Format_.Endline_ = DFL_ENDLINE<CharT>;
+        for (auto &pd : *this)
+            pd.Format(Format_);
     }
 
     template <typename CharT>
@@ -309,18 +313,25 @@ namespace SimpleCSV
     std::basic_istream<CharT> &operator>>(std::basic_istream<CharT> &is, BasicCsvTable<CharT> &_CsvTable)
     {
         IndexT row = 0, loadedline = 0;
-        BasicCsvRow CsvRow_tmp(_CsvTable.Range(), _CsvTable.Format());
+        BasicCsvRow<CharT> CsvRow_tmp(_CsvTable.Range(), _CsvTable.Format());
         do
         {
             is >> CsvRow_tmp;
 
-            if (_CsvTable.Range().Header_ == nIndex || loadedline++ >= _CsvTable.Range().Header_) //如果Header_ == nIndex，为没有Header_的情况，每一行都被读入；如果loadedline >= Header_，可以读入余下的行
+            if (!CsvRow_tmp.empty())
             {
-                ++row;
-                _CsvTable.emplace_back(CsvRow_tmp);
+                while (CsvRow_tmp.size() < _CsvTable.Columns()) //增加列数与表头对齐
+                    CsvRow_tmp.emplace_back(std::basic_string<CharT>());
+                while (CsvRow_tmp.size() > _CsvTable.Columns()) //去掉多出的列数
+                    CsvRow_tmp.pop_back();
+                if (_CsvTable.Range().Header_ == nIndex || loadedline++ >= _CsvTable.Range().Header_) //如果Header_ == nIndex，为没有Header_的情况，每一行都被读入；如果loadedline >= Header_，可以读入余下的行
+                {
+                    ++row;
+                    _CsvTable.emplace_back(CsvRow_tmp);
+                }
             }
 
-            if (row == 1 && ~_CsvTable.Range().Header_) //如果csv中只有一个元素（只有一行），且Header_存在，则该行为Header_，该行的列数为全表列数，其行与其对齐
+            if (row == 1) //以第一行列数为全表列数
                 _CsvTable.Columns(CsvRow_tmp.size());
 
             CsvRow_tmp.clear();
@@ -341,4 +352,4 @@ namespace SimpleCSV
 
 }
 
-#endif
+#endif //__SIMPLECSV_HPP
