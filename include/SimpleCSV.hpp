@@ -7,6 +7,7 @@
  *          v0.1.1  去掉了BasicCsvRow及BasicCsvTable析构函数中显式调用std::vector()::~vector()的部分
  *          v0.1.2  排除空行；修改BasicCsvTable的CsvFormat后修改所有内部CsvRow的Format属性；补齐或修剪
  *                  列数使与表头相等
+ *          v0.2.0b1增加2个insert函数。
  * 
  */
 
