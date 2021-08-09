@@ -9,6 +9,7 @@
  *                  列数使与表头相等
  *          v0.2.0  完成重写所有使元素增减的修改器（insert，emplace，erase，push_back，emplace_back。
  *          v0.2.1 重写部分构造函数。
+ *          v0.2.2 增加行swap()函数，增加SwapRow()函数。
  * 
  */
 
@@ -92,7 +93,7 @@ namespace SimpleCSV
     class BasicCsvRow : public vector<std::basic_string<CharT>>
     {
     private:
-        IndexT row_;
+        IndexT RowNumber_;
         CsvRange Range_;
         CsvFormat<CharT> Format_;
         friend BasicCsvTable<CharT>;
@@ -113,11 +114,13 @@ namespace SimpleCSV
         const CsvRange &Range() const noexcept { return Range_; }
         const CsvFormat<CharT> &Format() const noexcept { return Format_; }
 
-        void Row(IndexT _row) noexcept { row_ = _row; }
-        IndexT Row() const noexcept { return row_; }
+        void Row(IndexT _row) noexcept { RowNumber_ = _row; }
+        IndexT Row() const noexcept { return RowNumber_; }
 
-        std::basic_string<CharT> &operator[](const std::basic_string<CharT> &_FieldName);
-        const std::basic_string<CharT> &operator[](const std::basic_string<CharT> &_FieldName) const;
+        std::basic_string<CharT> &operator[](
+            const std::basic_string<CharT> &_FieldName);
+        const std::basic_string<CharT> &operator[](
+            const std::basic_string<CharT> &_FieldName) const;
     };
 
     //SECTION:  class BasicCsvTable definition
@@ -138,7 +141,6 @@ namespace SimpleCSV
     public:
         using vector<BasicCsvRow<CharT>>::vector;
         BasicCsvTable() = default;
-        // BasicCsvTable(IndexT _Row, const typename vector<BasicCsvRow<CharT>>::allocator_type &alloc) = delete;
         BasicCsvTable(const CsvRange &_range,
                       const CsvFormat<CharT> &_format) noexcept
             : vector<BasicCsvRow<CharT>>(),
@@ -170,9 +172,9 @@ namespace SimpleCSV
         BasicCsvRow<CharT> Column(IndexT _Index) const noexcept;                     //返回指定列整列数据
         IndexT HeadIndex(const std::basic_string<CharT> &_fieldname) const noexcept; //返回指定字符串在表头中的位置，如果没有表头，或没有找到字符串，返回nIndex;
 
-        IndexT Rows() const noexcept { return vector<BasicCsvRow<CharT>>::size(); } //返回行数
-        IndexT Columns() const noexcept { return Columns_; }                        //返回列数
-        void Columns(IndexT _Columns) { Columns_ = _Columns; }                      //设置列数
+        IndexT Rows() const noexcept { return this->size(); }  //返回行数
+        IndexT Columns() const noexcept { return Columns_; }   //返回列数
+        void Columns(IndexT _Columns) { Columns_ = _Columns; } //设置列数
 
         typename BasicCsvTable<CharT>::iterator insert(
             typename BasicCsvTable<CharT>::const_iterator _InsertPosition,
@@ -210,6 +212,12 @@ namespace SimpleCSV
 
         void resize(IndexT _Count);
         void resize(IndexT _Count, const BasicCsvRow<CharT> &_CsvRow);
+
+        void swap(BasicCsvTable<CharT> &_CsvTable);
+
+        void SwapRow(IndexT _RowNumber1, IndexT _RowNumber2);
+        void SwapRow(typename BasicCsvTable<CharT>::iterator _RowIt1,
+                     typename BasicCsvTable<CharT>::iterator _RowIt2);
     };
 
     //SECTION: class BasicCsvRow method implementation
@@ -236,7 +244,7 @@ namespace SimpleCSV
     inline std::basic_string<CharT> &BasicCsvRow<CharT>::operator[](
         const std::basic_string<CharT> &_FieldName)
     {
-        auto CsvRowHead = this - row_;
+        auto CsvRowHead = this - RowNumber_;
         for (auto ItCsvRow = CsvRowHead->begin(); ItCsvRow < CsvRowHead->end(); ++ItCsvRow)
         {
             if (*ItCsvRow == _FieldName)
@@ -261,7 +269,9 @@ namespace SimpleCSV
         IndexT _Count)
     {
         auto itpos = _ItPos;
-        for (auto ItPosSize = itpos->size(); itpos < _Position + _Count; ++itpos)
+        if (front().size())
+            Columns_ = front().size();
+        for (IndexT ItPosSize = itpos->size(); itpos < _Position + _Count; ++itpos)
         {
             itpos->Format(Format_);
             ItPosSize = itpos->size();
@@ -275,9 +285,9 @@ namespace SimpleCSV
                 itpos->insert(itpos->end(), Columns_ - ItPosSize, std::basic_string<CharT>());
             }
         }
-        for (auto it = _ItPos; it < this->end(); ++it)
+        for (itpos = _ItPos; itpos < this->end(); ++itpos)
         {
-            it->row_ = (this->begin() == it) ? 0 : ((it - 1)->row_ + 1);
+            itpos->RowNumber_ = (this->begin() == itpos) ? 0 : ((itpos - 1)->RowNumber_ + 1);
         }
     }
 
@@ -450,6 +460,40 @@ namespace SimpleCSV
             vector<BasicCsvRow<CharT>>::resize(_Count, _CsvRow);
     }
 
+    template <class CharT>
+    inline void BasicCsvTable<CharT>::swap(BasicCsvTable<CharT> &_CsvTable)
+    {
+        IndexT columntemp = _CsvTable.Columns_;
+        _CsvTable.Columns_ = Columns_;
+        Columns_ = columntemp;
+        CsvFormat<CharT> formattemp = _CsvTable.Format_;
+        _CsvTable.Format_ = Format_;
+        Format_ = formattemp;
+        vector<BasicCsvRow<CharT>>::swap(_CsvTable);
+    }
+
+    template <class CharT>
+    inline void BasicCsvTable<CharT>::SwapRow(IndexT _RowNumber1, IndexT _RowNumber2)
+    {
+        if (_RowNumber1 <= this->size() && _RowNumber2 <= this->size())
+            (this->begin() + _RowNumber1)->swap(*(this->begin() + _RowNumber2));
+        return;
+    }
+
+    template <class CharT>
+    inline void BasicCsvTable<CharT>::SwapRow(typename BasicCsvTable<CharT>::iterator _RowIt1,
+                                              typename BasicCsvTable<CharT>::iterator _RowIt2)
+    {
+        if (_RowIt1 >= this->begin() &&
+            _RowIt1 <= this->end() &&
+            _RowIt2 >= this->begin() &&
+            _RowIt2 <= this->end())
+        {
+            _RowIt1->swap(_RowIt2);
+        }
+        return;
+    }
+
     //SECTION: other non member mothods
 
     template <class CharT>
@@ -566,7 +610,7 @@ namespace SimpleCSV
     template <class CharT>
     std::basic_istream<CharT> &operator>>(std::basic_istream<CharT> &is, BasicCsvTable<CharT> &_CsvTable)
     {
-        IndexT row = 0, loadedline = 0;
+        IndexT row = _CsvTable.size(), loadedline = 0;
         BasicCsvRow<CharT> CsvRow_tmp(_CsvTable.Range(), _CsvTable.Format());
         do
         {
