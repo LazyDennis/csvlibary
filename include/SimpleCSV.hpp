@@ -93,7 +93,7 @@ namespace SimpleCSV
     class BasicCsvRow : public vector<std::basic_string<CharT>>
     {
     private:
-        IndexT RowNumber_;
+        IndexT RowIndex_;
         CsvRange Range_;
         CsvFormat<CharT> Format_;
         friend BasicCsvTable<CharT>;
@@ -114,8 +114,8 @@ namespace SimpleCSV
         const CsvRange &Range() const noexcept { return Range_; }
         const CsvFormat<CharT> &Format() const noexcept { return Format_; }
 
-        void Row(IndexT _row) noexcept { RowNumber_ = _row; }
-        IndexT Row() const noexcept { return RowNumber_; }
+        void Row(IndexT _row) noexcept { RowIndex_ = _row; }
+        IndexT Row() const noexcept { return RowIndex_; }
 
         std::basic_string<CharT> &operator[](
             const std::basic_string<CharT> &_FieldName);
@@ -176,6 +176,8 @@ namespace SimpleCSV
         IndexT Columns() const noexcept { return Columns_; }   //返回列数
         void Columns(IndexT _Columns) { Columns_ = _Columns; } //设置列数
 
+        void assign(IndexT _Count, const BasicCsvRow<CharT> &_CsvRow);
+
         typename BasicCsvTable<CharT>::iterator insert(
             typename BasicCsvTable<CharT>::const_iterator _InsertPosition,
             const BasicCsvRow<CharT> &_CsvRow);
@@ -215,7 +217,7 @@ namespace SimpleCSV
 
         void swap(BasicCsvTable<CharT> &_CsvTable);
 
-        void SwapRow(IndexT _RowNumber1, IndexT _RowNumber2);
+        void SwapRow(IndexT _RowIndex1, IndexT _RowIndex2);
         void SwapRow(typename BasicCsvTable<CharT>::iterator _RowIt1,
                      typename BasicCsvTable<CharT>::iterator _RowIt2);
     };
@@ -244,7 +246,7 @@ namespace SimpleCSV
     inline std::basic_string<CharT> &BasicCsvRow<CharT>::operator[](
         const std::basic_string<CharT> &_FieldName)
     {
-        auto CsvRowHead = this - RowNumber_;
+        auto CsvRowHead = this - RowIndex_;
         for (auto ItCsvRow = CsvRowHead->begin(); ItCsvRow < CsvRowHead->end(); ++ItCsvRow)
         {
             if (*ItCsvRow == _FieldName)
@@ -287,7 +289,7 @@ namespace SimpleCSV
         }
         for (itpos = _ItPos; itpos < this->end(); ++itpos)
         {
-            itpos->RowNumber_ = (this->begin() == itpos) ? 0 : ((itpos - 1)->RowNumber_ + 1);
+            itpos->RowIndex_ = (this->begin() == itpos) ? 0 : ((itpos - 1)->RowIndex_ + 1);
         }
     }
 
@@ -473,10 +475,10 @@ namespace SimpleCSV
     }
 
     template <class CharT>
-    inline void BasicCsvTable<CharT>::SwapRow(IndexT _RowNumber1, IndexT _RowNumber2)
+    inline void BasicCsvTable<CharT>::SwapRow(IndexT _RowIndex1, IndexT _RowIndex2)
     {
-        if (_RowNumber1 <= this->size() && _RowNumber2 <= this->size())
-            (this->begin() + _RowNumber1)->swap(*(this->begin() + _RowNumber2));
+        if (_RowIndex1 <= this->size() && _RowIndex2 <= this->size())
+            (this->begin() + _RowIndex1)->swap(*(this->begin() + _RowIndex2));
         return;
     }
 

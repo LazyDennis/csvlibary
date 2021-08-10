@@ -1,21 +1,21 @@
 # Simple CSV libary for modern C++
 
-This is a CSV(Comma-Separated Values) libary for simply use of reading / writing csv files
+This is a CSV(Comma-Separated Values) libary for simple use of reading / writing csv files
 
 ---
 
 ## Description
 
 This is a CSV libary written by `C++`. It can be used to read or write CSV files. By inheriting `std::vector` class of `C++` standard libary, there are two main classes in the libary, included in namespace `SimpleCSV`. I am going show how to use the libary below.
-Delimeter and escape character can be customized, and `','` as delimeter , `'\"'` as escape character and `'\n'` as newline, are set as default. Multiple charactors of delimeter is supported in this libary.
+Delimeter and escape character can be customized, and `','` as delimeter , `'\"'` as escape character and `'\n'` as newline, are set as default. Multiple characters of delimeter is supported in this libary.
 
 ---
 
 ## Features
 
 1. C++11 standard is required.
-2. Using template to support different types of character.
-3. Methods of `std::vector` can be used to operator rows and elements, also STL algorithm.
+2. Using template to support different types of characters.
+3. Methods of `std::vector` can be used to operate rows and elements, also STL algorithm.
 
 ---
 
@@ -56,8 +56,9 @@ Tow struct are also be defined:
 `struct CsvRange` is defined to descript the range of a CSV file to be read.
 `struct CsvFormat` is defined to descript the features of a CSV files.
 
-###Gobal Variable
-Four Gobal variable in the namespace are defined as below:
+### Global Variable
+
+Four Global variable in the namespace are defined as below:
 
 ```c++
     static const IndexT nIndex = -1;  // Maxiumn of rows and columns
@@ -88,7 +89,7 @@ A class to record one row of a CSV table.
 
 A class to record a CSV table, which is combined by CsvRow(s).
 
-By inheriting `vector` class, the member function of vector is also able to be used directly.
+By inheriting `std::vector` class, the member function of vector is also able to be used directly.
 
 Each class is specialized as:
 
@@ -105,9 +106,9 @@ Public methods are as below
 
 #### struct CsvRange
 
-| Method                                                                                                        | Usage                                                  |
-| :------------------------------------------------------------------------------------------------------------ | :----------------------------------------------------- |
-| `CsvRange(IndexT _header = 0, IndexT _CountRows = nIndex, IndexT _index = 0, IndexT _CountColumns = nIndex);` | Default construtor to construct a variable of CsvRange |
+| Method                                                                                                        | Usage                                                   |
+| :------------------------------------------------------------------------------------------------------------ | :------------------------------------------------------ |
+| `CsvRange(IndexT _header = 0, IndexT _CountRows = nIndex, IndexT _index = 0, IndexT _CountColumns = nIndex);` | Default constructor to construct a variable of CsvRange |
 
 #### struct Format
 
@@ -117,14 +118,16 @@ Public methods are as below
 
 #### class CsvRow
 
-##### 1. Member Methods
+##### 1. Public Member Methods
 
-| Method                                                                                            | Usage                                                                                            |
-| :------------------------------------------------------------------------------------------------ | :----------------------------------------------------------------------------------------------- |
-| `CsvRow()`                                                                                        | Default construtor to construct a variable of CsvRow                                             |
-| `CsvRow(const CsvRange &_range, const CsvFormat &_format) noexcept`                               | Customized range and format can be set by using this construtor to initialize a CsvRow Variable. |
-| `void Range(const CsvRange &_range) noexcept`<p></p>`const CsvRange &Range() const noexcept`      | Use `.Range(range)` to set range property or use `.Range()` to get current range property.       |
-| `void Format(const CsvFormat &_format) noexcept`<p></p>`const CsvFormat &Format() const noexcept` | Use `.Format(format)` to set format property or use `.Format()` to get current format property.  |
+| Method                                                                                            | Usage                                                                                                                            |
+| :------------------------------------------------------------------------------------------------ | :------------------------------------------------------------------------------------------------------------------------------- |
+| `CsvRow()`                                                                                        | Default constructor to construct a variable of CsvRow                                                                            |
+| `CsvRow(const CsvRange &_range, const CsvFormat &_format) noexcept`                               | Customized range and format can be set by using this constructor to initialize a CsvRow Variable.                                |
+| `void Range(const CsvRange &_range) noexcept`<p></p>`const CsvRange &Range() const noexcept`      | Use `.Range(range)` to set range property or use `.Range()` to get current range property.                                       |
+| `void Format(const CsvFormat &_format) noexcept`<p></p>`const CsvFormat &Format() const noexcept` | Use `.Format(format)` to set format property or use `.Format()` to get current format property.                                  |
+| `void Row(IndexT _row) noexcept` <p></p>`IndexT Row() const noexcept`                             | Use `.Row(row)` to set a row number for a BasicCsvRow object, or use `.Row()` to get current row number.                         |
+| `std::basic_string<CharT> &operator[](const std::basic_string<CharT> &_FieldName)`                | Use a header string to find a specified elements of a row. A `std::invalid_argumnet` will be throwed if the string is not found. |
 
 ##### 2. Non member methods
 
@@ -135,18 +138,21 @@ Public methods are as below
 
 #### class CsvTable
 
-##### 1. Member Methods
+##### 1. Public Member Methods
 
-| Method                                                                                            | Usage                                                                                                |
-| :------------------------------------------------------------------------------------------------ | :--------------------------------------------------------------------------------------------------- |
-| `CsvTable()`                                                                                      | Default construtor to construct a variable of CsvTable                                               |
-| `CsvTable(const CsvRange &_range, const CsvFormat &_format) noexcept`                             | Customized range and format can be set by using this construtor to initialize a CsvTable Variable.   |
-| `void Range(const CsvRange &_range) noexcept`<p></p>`const CsvRange &Range() const noexcept`      | Use `.Range(range)` to set range property or use `.Range()` to get current range property.           |
-| `void Format(const CsvFormat &_format) noexcept`<p></p>`const CsvFormat &Format() const noexcept` | Use `.Format(format)` to set format property or use `.Format()` to get current format property.      |
-| ` CsvRow Column(IndexT _Index) const noexcept`                                                    | Get a whole column data from a CSV table in a type of `CsvRow`.                                      |
-| `IndexT HeadIndex(const StrT &_fieldname) const noexcept`                                         | Return a `IndexT` type number by inputting a header string. `nIndex` would be returned if not found. |
-| `IndexT Rows() const noexcept`                                                                    | Return number of rows of a table.                                                                    |
-| `IndexT Columns() const noexcept`                                                                 | Return number of columns of a table.                                                                 |
+| Method                                                                                            | Usage                                                                                                                                          |
+| :------------------------------------------------------------------------------------------------ | :--------------------------------------------------------------------------------------------------------------------------------------------- |
+| `CsvTable()`                                                                                      | Default constructor to construct a variable of CsvTable                                                                                        |
+| `CsvTable(const CsvRange &_range, const CsvFormat &_format) noexcept`                             | Customized range and format can be set by using this constructor to initialize a CsvTable Variable.                                            |
+| ` explicit BasicCsvTable(IndexT _Row, IndexT _Columns = 0) noexcept`                              | Make a empty table of specified rows and columns.                                                                                              |
+| `void Range(const CsvRange &_range) noexcept`<p></p>`const CsvRange &Range() const noexcept`      | Use `.Range(range)` to set range property or use `.Range()` to get current range property.                                                     |
+| `void Format(const CsvFormat &_format) noexcept`<p></p>`const CsvFormat &Format() const noexcept` | Use `.Format(format)` to set format property or use `.Format()` to get current format property.                                                |
+| ` CsvRow Column(IndexT _Index) const noexcept`                                                    | Get a whole column data from a CSV table in a type of `CsvRow`.                                                                                |
+| `IndexT HeadIndex(const StrT &_fieldname) const noexcept`                                         | Return a `IndexT` type number by inputting a header string. `nIndex` would be returned if not found.                                           |
+| `IndexT Rows() const noexcept`                                                                    | Return number of rows of a table.                                                                                                              |
+| `IndexT Columns() const noexcept` <p> </p> `void Columns(IndexT _Columns)`                        | Use `.Columns(columns)` to pre-set the columns number for a table, or use `.Columns()` to get current columns number of the current table.     |
+| `void SwapRow(IndexT _RowIndex1, IndexT _RowIndex2)`                                              | Swap rows of the current table by using row index. The function will do nothing if one of the parameters is bigger than the size of the table. |
+| `SwapRow(iterator _RowIt1, iterator _RowIt2)`                                                     | Swap rows of the current table by using iterator. The function will do nothing if one of the iterators is not pointing to the table.           |
 
 ##### 2. Non member methods
 
@@ -159,7 +165,17 @@ Public methods are as below
 
 ## Usage
 
-#### 1. Reading and writing a csv file.
+#### 1. Initialize an object.
+
+Both `SimpleCSV::BasicCsvRow<CharT>` and `SimpleCSV::BasicCsvTable<CharT>` are `std::vector` base objects. Constructors of `std::vector` are usable to initialize an object for each.
+
+```cpp
+	SimpleCSV::wCsvTable csvtest; // default ctor, an empty table.
+	SimpleCSV::CsvTable csvtest{{"Head1","Head2","Head3"}, {"Value01","Value02","Value03"},{"Value11","Value12","Value13"}}; // Use intialize-list to initialize csvtest object.
+	SimpleCSV::CsvTable csvtest1(csvtest.begin() + 1, csvtest.end() - 1); // Use iterator range to initialize an object.
+```
+
+#### 2. Reading and writing a csv file.
 
 Operator `<<` and `>>` are overloaded to read a CSV file or a row of a CSV file, so that you may need to open a file by using `std::ifstream`, `std::ofstream` or `std::fstream`.
 Sample of reading a CSV file:
@@ -179,7 +195,7 @@ You may also use `std::cout` to show a row of a table in the console like below:
     std::cout << csvtest[0]; //show the first row(header)
 ```
 
-#### 2. Setting a special format to process a CSV file
+#### 3. Setting a special format to process a CSV file
 
 Data is seperated usually by a comma(`','`) in a CSV file. And a quote(`'\"'`) as an escape charater. There would be special files sometimes, however, such as TSV(Tab-seperated Value). You can define a variable by using `struct CsvFormat` to change the this kind of properties to process the special files.
 
@@ -198,10 +214,10 @@ Data is seperated usually by a comma(`','`) in a CSV file. And a quote(`'\"'`) a
 Note:
 
 - `Delimeter_` can be a multi-character string.
-- `Newline_` is set as interface, but not avalible.
-- `Delimeter_`and `Quote_` should not be the same charater. If set as the same, `Quote_` would be set to default. And if the `Quote_` already equals `DFL_QUOTE`, `Delimeter_` would be set to default.
+- `Newline_` is set as interface, but not available.
+- `Delimeter_`and `Quote_` should not be the same character. If set as the same, `Quote_` would be set to default. And if the `Quote_` already equals `DFL_QUOTE`, `Delimeter_` would be set to default.
 
-#### 3. Setting read-range when reading a CSV file.
+#### 4. Setting read-range when reading a CSV file.c
 
 You can only read specified rows and columns from a CSV file, by using a `struct CsvRange`.
 
@@ -213,16 +229,16 @@ You can only read specified rows and columns from a CSV file, by using a `struct
 There are for elements in `struct CsvRange`.
 | elements | meanings
 | --- | ---- |
-| Header* | the starting row to be read |
-|CountRows* | the number of rows to be read from starting row|
-| Index* | the starting column to be read |
-| CountColumns* | the number of columns to be read from starting columns |
+| Header| the starting row to be read |
+|CountRows | the number of rows to be read from starting row|
+| Index | the starting column to be read |
+| CountColumns | the number of columns to be read from starting columns |
 
 The sample above means read **5** rows from **2nd** row and **6** columns from **3rd** column, from a CSV file.
 
-#### 4. Operate a specified cell of the table
+#### 5. Operate a specified cell of the table
 
-Inherting from `vector` means you can also use the public method of `vector` to operate the table, such as `insert()`, `erase()`, etc.
+Inheriting from `std::vector` means you can also use the public method of `vector` to operate the table, such as `insert()`, `erase()`, etc.
 Overloaded operator`[]` is of course usable.
 
 | column1 | column2 | column3 |
@@ -234,6 +250,12 @@ To change `value2`, you can do as below:
 
 ```c++
     csvtest[1][csvtest.HeadIndex("column2")] = "value7";
+```
+
+You can also:
+
+```cpp
+	csvtest[1]["column2"] = "value7"; //std::invalid_argumnet will be throwed if "column2" does not exist.
 ```
 
 ## License
