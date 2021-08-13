@@ -153,6 +153,7 @@ Public methods are as below
 | `IndexT Columns() const noexcept` <p> </p> `void Columns(IndexT _Columns)`                        | Use `.Columns(columns)` to pre-set the columns number for a table, or use `.Columns()` to get current columns number of the current table.     |
 | `void SwapRow(IndexT _RowIndex1, IndexT _RowIndex2)`                                              | Swap rows of the current table by using row index. The function will do nothing if one of the parameters is bigger than the size of the table. |
 | `SwapRow(iterator _RowIt1, iterator _RowIt2)`                                                     | Swap rows of the current table by using iterator. The function will do nothing if one of the iterators is not pointing to the table.           |
+|`typename BasicCsvTable<CharT>::iterator NewRow()`|Add and empty row at the last of the table. The row should have the same columns of the table.|
 
 ##### 2. Non member methods
 

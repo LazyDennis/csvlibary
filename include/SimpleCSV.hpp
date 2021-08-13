@@ -8,8 +8,10 @@
  *          v0.1.2  排除空行；修改BasicCsvTable的CsvFormat后修改所有内部CsvRow的Format属性；补齐或修剪
  *                  列数使与表头相等
  *          v0.2.0  完成重写所有使元素增减的修改器（insert，emplace，erase，push_back，emplace_back。
- *          v0.2.1 重写部分构造函数。
- *          v0.2.2 增加行swap()函数，增加SwapRow()函数。
+ *          v0.2.1  重写部分构造函数。
+ *          v0.2.2  增加行swap()函数，增加SwapRow()函数。
+ *          v0.2.3  重写了assign()函数。重写了operator=()函数, 重写copy ctor和move ctor。
+ *          v0.2.4  增加NewRow()函数。
  * 
  */
 
@@ -139,15 +141,13 @@ namespace SimpleCSV
             IndexT _Count);
 
     public:
-        using vector<BasicCsvRow<CharT>>::vector;
         BasicCsvTable() = default;
         BasicCsvTable(const CsvRange &_range,
                       const CsvFormat<CharT> &_format) noexcept
             : vector<BasicCsvRow<CharT>>(),
               Range_(_range) { Format(_format); }
         BasicCsvTable(IndexT _Row, const BasicCsvRow<CharT> &_CsvRow) noexcept
-            : vector<BasicCsvRow<CharT>>(_Row, _CsvRow),
-              Columns_(_CsvRow.size()) noexcept
+            : vector<BasicCsvRow<CharT>>(_Row, _CsvRow) noexcept
         {
             ModifyRow(this->begin(), this->cbegin(), 0);
         }
@@ -156,12 +156,20 @@ namespace SimpleCSV
               Columns_(_Columns) { ModifyRow(this->begin(), this->cbegin(), 0); }
         BasicCsvTable(typename BasicCsvTable<CharT>::const_iterator _FromFirstPosition,
                       typename BasicCsvTable<CharT>::const_iterator _FromLastPosition) noexcept
-            : vector<BasicCsvRow<CharT>>(_FromLastPosition, _FromLastPosition)
-        {
-            ModifyRow(this->begin(), this->cbegin(), 0);
-        }
+            : vector<BasicCsvRow<CharT>>(_FromLastPosition,
+                                         _FromLastPosition) { ModifyRow(this->begin(), this->cbegin(), 0); }
         BasicCsvTable(std::initializer_list<BasicCsvRow<CharT>> _CsvRowList) noexcept
             : vector<BasicCsvRow<CharT>>(_CsvRowList) { ModifyRow(this->begin(), this->cbegin(), 0); };
+        BasicCsvTable(const BasicCsvTable<CharT> &_CsvTable) : vector<BasicCsvRow<CharT>>(_CsvTable)
+        {
+            Format_ = _CsvTable.Format_;
+            Columns_ = _CsvTable.Columns;
+        }
+        BasicCsvTable(BasicCsvTable &&_CsvTable) : vector<BasicCsvRow<CharT>>(std::move(_CsvTable))
+        {
+            Format_ = std::move(_CsvTable.Format_);
+            Columns_ = _CsvTable.Columns;
+        }
         ~BasicCsvTable() noexcept {}
 
         void Range(const CsvRange &_range) noexcept { Range_ = _range; }
@@ -175,8 +183,16 @@ namespace SimpleCSV
         IndexT Rows() const noexcept { return this->size(); }  //返回行数
         IndexT Columns() const noexcept { return Columns_; }   //返回列数
         void Columns(IndexT _Columns) { Columns_ = _Columns; } //设置列数
+        typename BasicCsvTable<CharT>::iterator NewRow();
+
+        const BasicCsvTable<CharT> &operator=(std::initializer_list<BasicCsvRow<CharT>> _CsvRowList);
+        const BasicCsvTable<CharT> &operator=(const BasicCsvTable<CharT> &_CsvTable);
+        const BasicCsvTable<CharT> &operator=(BasicCsvTable<CharT> &&_CsvTable);
 
         void assign(IndexT _Count, const BasicCsvRow<CharT> &_CsvRow);
+        void assign(typename BasicCsvTable<CharT>::const_iterator _FromFirstPosition,
+                    typename BasicCsvTable<CharT>::const_iterator _FromLastPosition);
+        void assign(std::initializer_list<BasicCsvRow<CharT>> _CsvRowList);
 
         typename BasicCsvTable<CharT>::iterator insert(
             typename BasicCsvTable<CharT>::const_iterator _InsertPosition,
@@ -335,6 +351,69 @@ namespace SimpleCSV
                 if (_fieldname == *HeadIt)
                     return HeadIt - this->cbegin()->cbegin();
         return nIndex;
+    }
+
+    template <class CharT>
+    inline typename BasicCsvTable<CharT>::iterator BasicCsvTable<CharT>::NewRow()
+    {
+        if (this->empty())
+            this->emplace_back(BasicCsvRow<CharT>());
+        else
+            this->emplace_back(BasicCsvRow<CharT>(Columns_));
+        return this->end() - 1;
+    }
+
+    template <class CharT>
+    inline const BasicCsvTable<CharT> &BasicCsvTable<CharT>::operator=(
+        std::initializer_list<BasicCsvRow<CharT>> _CsvRowList)
+    {
+        vector<BasicCSvRow<CharT>>::operator=(_CsvRowList);
+        ModifyRow(this->begin(), this->begin(), 0);
+        return *this;
+    }
+
+    template <class CharT>
+    inline const BasicCsvTable<CharT> &BasicCsvTable<CharT>::operator=(const BasicCsvTable<CharT> &_CsvTable)
+    {
+        vector<BasicCsvRow<CharT>>::operator=(_CsvTable);
+        Format_ = _CsvTable.Format_;
+        Columns_ = _CsvTable.Columns_;
+        return *this;
+    }
+
+    template <class CharT>
+    inline const BasicCsvTable<CharT> &BasicCsvTable<CharT>::operator=(BasicCsvTable<CharT> &&_CsvTable)
+    {
+        vector<BasicCsvRow<CharT>>::operator=(std::move(_CsvTable));
+        Format_ = _CsvTable.Format_;
+        Columns_ = _CsvTable.Columns_;
+        return *this;
+    }
+
+    template <class CharT>
+    inline void BasicCsvTable<CharT>::assign(IndexT _Rows, const BasicCsvRow<CharT> &_CsvRow)
+    {
+        vector<BasicCsvRow<CharT>>::assign(_Rows, _CsvRow);
+        ModifyRow(this->begin(), this->cbegin(), 0);
+        return;
+    }
+
+    template <class CharT>
+    inline void BasicCsvTable<CharT>::assign(
+        typename BasicCsvTable<CharT>::const_iterator _FromFirstPosition,
+        typename BasicCsvTable<CharT>::const_iterator _FromLastPosition)
+    {
+        vector<BasicCsvRow<CharT>>::assign(_FromFirstPosition, _FromLastPosition);
+        ModifyRow(this->begin(), this->cbegin(), 0);
+        return;
+    }
+    template <class CharT>
+    inline void BasicCsvTable<CharT>::assign(
+        std::initializer_list<BasicCsvRow<CharT>> _CsvRowList)
+    {
+        vector<BasicCsvRow<CharT>>::assign(_CsvRowList);
+        ModifyRow(this->begin(), this->cbegin(), 0);
+        return;
     }
 
     template <class CharT>
