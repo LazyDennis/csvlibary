@@ -10,7 +10,8 @@
  *          v0.2.0  完成重写所有使元素增减的修改器（insert，emplace，erase，push_back，emplace_back。
  *          v0.2.1  重写部分构造函数。
  *          v0.2.2  增加行swap()函数，增加SwapRow()函数。
- *          v0.2.3  重写了assign()函数。重写了operator=()函数。
+ *          v0.2.3  重写了assign()函数。重写了operator=()函数, 重写copy ctor和move ctor。
+ *          v0.2.4  增加NewRow()函数。
  * 
  */
 
@@ -182,6 +183,7 @@ namespace SimpleCSV
         IndexT Rows() const noexcept { return this->size(); }  //返回行数
         IndexT Columns() const noexcept { return Columns_; }   //返回列数
         void Columns(IndexT _Columns) { Columns_ = _Columns; } //设置列数
+        typename BasicCsvTable<CharT>::iterator NewRow();
 
         const BasicCsvTable<CharT> &operator=(std::initializer_list<BasicCsvRow<CharT>> _CsvRowList);
         const BasicCsvTable<CharT> &operator=(const BasicCsvTable<CharT> &_CsvTable);
@@ -349,6 +351,16 @@ namespace SimpleCSV
                 if (_fieldname == *HeadIt)
                     return HeadIt - this->cbegin()->cbegin();
         return nIndex;
+    }
+
+    template <class CharT>
+    inline typename BasicCsvTable<CharT>::iterator BasicCsvTable<CharT>::NewRow()
+    {
+        if (this->empty())
+            this->emplace_back(BasicCsvRow<CharT>());
+        else
+            this->emplace_back(BasicCsvRow<CharT>(Columns_));
+        return this->end() - 1;
     }
 
     template <class CharT>
