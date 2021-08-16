@@ -12,6 +12,7 @@
  *          v0.2.2  增加行swap()函数，增加SwapRow()函数。
  *          v0.2.3  重写了assign()函数。重写了operator=()函数, 重写copy ctor和move ctor。
  *          v0.2.4  增加NewRow()函数。
+ *          v0.2.5  解决无法调用BasicCsvRow.operator[](size_t index)的问题。
  * 
  */
 
@@ -102,6 +103,7 @@ namespace SimpleCSV
 
     public:
         using vector<std::basic_string<CharT>>::vector;
+        using vector<std::basic_string<CharT>>::operator[];
 
         BasicCsvRow() = default;
         BasicCsvRow(const CsvRange &_range,
