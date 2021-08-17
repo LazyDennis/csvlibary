@@ -13,6 +13,7 @@
  *          v0.2.3  重写了assign()函数。重写了operator=()函数, 重写copy ctor和move ctor。
  *          v0.2.4  增加NewRow()函数。
  *          v0.2.5  解决无法调用BasicCsvRow.operator[](size_t index)的问题。
+ *          v0.2.6  简化表格读入的代码，修复指定列范围时，读入残余的问题。
  * 
  */
 
@@ -603,9 +604,10 @@ namespace SimpleCSV
             if (EndlineFlag)
                 StrSource = StrTmp + StrSource; //如果内容包含换行，则添加上换行前的内容
             it1 = it2 = StrSource.begin();
-            while (it1 != StrSource.end() &&
+            while (it1 != StrSource.end() /* &&
                    (_CsvRow.Range().Index_ == nIndex ||
-                    column < _CsvRow.Range().CountColumns_)) //对读入行进行处理
+                    column < _CsvRow.Range().CountColumns_) */
+                   )                      //对读入行进行处理
             {
                 if (*it1 == _CsvRow.Format().Quote_)
                 {
@@ -656,6 +658,7 @@ namespace SimpleCSV
                           _CsvRow.Format().Delimeter_.size();
             }
         } while (EndlineFlag);
+        _CsvRow.erase(_CsvRow.begin() + _CsvRow.Range().CountColumns_, _CsvRow.end());
         return is;
     }
 
@@ -693,7 +696,7 @@ namespace SimpleCSV
     template <class CharT>
     std::basic_istream<CharT> &operator>>(std::basic_istream<CharT> &is, BasicCsvTable<CharT> &_CsvTable)
     {
-        IndexT row = _CsvTable.size(), loadedline = 0;
+        IndexT /* row = _CsvTable.size(), */ loadedline = 0;
         BasicCsvRow<CharT> CsvRow_tmp(_CsvTable.Range(), _CsvTable.Format());
         do
         {
@@ -701,22 +704,21 @@ namespace SimpleCSV
 
             if (!CsvRow_tmp.empty())
             {
-                while (row > 0 && CsvRow_tmp.size() < _CsvTable.Columns()) //增加列数与表头对齐
-                    CsvRow_tmp.emplace_back(std::basic_string<CharT>());
-                while (row > 0 && CsvRow_tmp.size() > _CsvTable.Columns()) //去掉多出的列数
-                    CsvRow_tmp.pop_back();
+                // while (row > 0 && CsvRow_tmp.size() < _CsvTable.Columns()) //增加列数与表头对齐
+                //     CsvRow_tmp.emplace_back(std::basic_string<CharT>());
+                // while (row > 0 && CsvRow_tmp.size() > _CsvTable.Columns()) //去掉多出的列数
+                //     CsvRow_tmp.pop_back();
                 if (_CsvTable.Range().Header_ == nIndex || loadedline++ >= _CsvTable.Range().Header_) //如果Header_ == nIndex，为没有Header_的情况，每一行都被读入；如果loadedline >= Header_，可以读入余下的行
                 {
-                    if (row == 0) //以第一行列数为全表列数
-                        _CsvTable.Columns(CsvRow_tmp.size());
-                    CsvRow_tmp.Row(row);
+                    // if (row == 0) //以第一行列数为全表列数
+                    //     _CsvTable.Columns(CsvRow_tmp.size());
+                    // CsvRow_tmp.Row(row);
                     _CsvTable.emplace_back(std::move(CsvRow_tmp));
-                    ++row;
+                    // ++row;
                 }
             }
-
             CsvRow_tmp.clear();
-        } while (!is.eof() && row < _CsvTable.Range().CountRows_);
+        } while (!is.eof() && _CsvTable.size() < _CsvTable.Range().CountRows_);
         return is;
     }
 
