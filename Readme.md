@@ -73,7 +73,14 @@ Four Global variable in the namespace are defined as below:
 
 ### Main Class
 
-Two main class is defined in the libary as:
+Three main class is defined in the libary as:
+
+```c++
+    template <typename CharT>
+    class BasicCsvColumn : public vector<std::basic_string<CharT>>
+```
+
+A clss to represent a column. There is not any connection to the table, so that you cannot use this class to operate the table.
 
 ```c++
     template <typename CharT>
@@ -120,14 +127,14 @@ Public methods are as below
 
 ##### 1. Public Member Methods
 
-| Method                                                                                            | Usage                                                                                                                            |
-| :------------------------------------------------------------------------------------------------ | :------------------------------------------------------------------------------------------------------------------------------- |
-| `CsvRow()`                                                                                        | Default constructor to construct a variable of CsvRow                                                                            |
-| `CsvRow(const CsvRange &_range, const CsvFormat &_format) noexcept`                               | Customized range and format can be set by using this constructor to initialize a CsvRow Variable.                                |
-| `void Range(const CsvRange &_range) noexcept`<p></p>`const CsvRange &Range() const noexcept`      | Use `.Range(range)` to set range property or use `.Range()` to get current range property.                                       |
-| `void Format(const CsvFormat &_format) noexcept`<p></p>`const CsvFormat &Format() const noexcept` | Use `.Format(format)` to set format property or use `.Format()` to get current format property.                                  |
-| `void Row(IndexT _row) noexcept` <p></p>`IndexT Row() const noexcept`                             | Use `.Row(row)` to set a row number for a BasicCsvRow object, or use `.Row()` to get current row number.                         |
-| `std::basic_string<CharT> &operator[](const std::basic_string<CharT> &_FieldName)`                | Use a header string to find a specified elements of a row. A `std::invalid_argumnet` will be throwed if the string is not found. |
+| Method                                                       | Usage                                                        |
+| :----------------------------------------------------------- | :----------------------------------------------------------- |
+| `CsvRow()`                                                   | Default constructor to construct a variable of CsvRow        |
+| `CsvRow(const CsvRange &_range, const CsvFormat &_format) noexcept` | Customized range and format can be set by using this constructor to initialize a CsvRow Variable. |
+| `void Range(const CsvRange &_range) noexcept`<p></p>`const CsvRange &Range() const noexcept` | Use `.Range(range)` to set range property or use `.Range()` to get current range property. |
+| `template <class CharT> void Format<CharT>(const CsvFormat &_format) noexcept`<p></p>`template <class CharT> const CsvFormat<CharT> &Format() const noexcept` | Use `.Format(format)` to set format property or use `.Format()` to get current format property. |
+| `void Row(IndexT _row) noexcept` <p></p>`IndexT Row() const noexcept` | Use `.Row(row)` to set a row number for a BasicCsvRow object, or use `.Row()` to get current row number. |
+| `template <class CharT> std::basic_string<CharT> &operator[](const std::basic_string<CharT> &_FieldName)` | Use a header string to find a specified elements of a row. A `*end()` will be returned if the string is not found. |
 
 ##### 2. Non member methods
 
@@ -140,20 +147,22 @@ Public methods are as below
 
 ##### 1. Public Member Methods
 
-| Method                                                                                            | Usage                                                                                                                                          |
-| :------------------------------------------------------------------------------------------------ | :--------------------------------------------------------------------------------------------------------------------------------------------- |
-| `CsvTable()`                                                                                      | Default constructor to construct a variable of CsvTable                                                                                        |
-| `CsvTable(const CsvRange &_range, const CsvFormat &_format) noexcept`                             | Customized range and format can be set by using this constructor to initialize a CsvTable Variable.                                            |
-| ` explicit BasicCsvTable(IndexT _Row, IndexT _Columns = 0) noexcept`                              | Make a empty table of specified rows and columns.                                                                                              |
-| `void Range(const CsvRange &_range) noexcept`<p></p>`const CsvRange &Range() const noexcept`      | Use `.Range(range)` to set range property or use `.Range()` to get current range property.                                                     |
-| `void Format(const CsvFormat &_format) noexcept`<p></p>`const CsvFormat &Format() const noexcept` | Use `.Format(format)` to set format property or use `.Format()` to get current format property.                                                |
-| ` CsvRow Column(IndexT _Index) const noexcept`                                                    | Get a whole column data from a CSV table in a type of `CsvRow`.                                                                                |
-| `IndexT HeadIndex(const StrT &_fieldname) const noexcept`                                         | Return a `IndexT` type number by inputting a header string. `nIndex` would be returned if not found.                                           |
-| `IndexT Rows() const noexcept`                                                                    | Return number of rows of a table.                                                                                                              |
-| `IndexT Columns() const noexcept` <p> </p> `void Columns(IndexT _Columns)`                        | Use `.Columns(columns)` to pre-set the columns number for a table, or use `.Columns()` to get current columns number of the current table.     |
-| `void SwapRow(IndexT _RowIndex1, IndexT _RowIndex2)`                                              | Swap rows of the current table by using row index. The function will do nothing if one of the parameters is bigger than the size of the table. |
-| `SwapRow(iterator _RowIt1, iterator _RowIt2)`                                                     | Swap rows of the current table by using iterator. The function will do nothing if one of the iterators is not pointing to the table.           |
-|`typename BasicCsvTable<CharT>::iterator NewRow()`|Add and empty row at the last of the table. The row should have the same columns of the table.|
+| Method                                                                                                                                                                                                                                                                | Usage                                                                                                                                          |
+| :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | :--------------------------------------------------------------------------------------------------------------------------------------------- |
+| `CsvTable()`                                                                                                                                                                                                                                                          | Default constructor to construct a variable of CsvTable                                                                                        |
+| `CsvTable(const CsvRange &_range, const CsvFormat &_format) noexcept`                                                                                                                                                                                                 | Customized range and format can be set by using this constructor to initialize a CsvTable Variable.                                            |
+| ` explicit BasicCsvTable(IndexT _Row, IndexT _Columns = 0) noexcept`                                                                                                                                                                                                  | Make a empty table of specified rows and columns.                                                                                              |
+| `void Range(const CsvRange &_range) noexcept`<p></p>`const CsvRange &Range() const noexcept`                                                                                                                                                                          | Use `.Range(range)` to set range property or use `.Range()` to get current range property.                                                     |
+| `template <class CharT> void Format<CharT>(const CsvFormat &_format) noexcept`<p></p>`template <class CharT> const CsvFormat<CharT> &Format<CharT>() const noexcept`                                                                                                  | Use `.Format(format)` to set format property or use `.Format()` to get current format property.                                                |
+| `template <class ChaT> BasicCsvColumn<CharT> Column(IndexT _Index) const noexcept`                                                                                                                                                                                    | Get a whole column data from a CSV table in a type of `CsvRow`.                                                                                |
+| `IndexT HeadIndex(const StrT &_fieldname) const noexcept`                                                                                                                                                                                                             | Return a `IndexT` type number by inputting a header string. `nIndex` would be returned if not found.                                           |
+| `IndexT Rows() const noexcept`                                                                                                                                                                                                                                        | Return number of rows of a table.                                                                                                              |
+| `IndexT Columns() const noexcept` <p> </p> `void Columns(IndexT _Columns)`                                                                                                                                                                                            | Use `.Columns(columns)` to pre-set the columns number for a table, or use `.Columns()` to get current columns number of the current table.     |
+| `void SwapRow(IndexT _RowIndex1, IndexT _RowIndex2)`                                                                                                                                                                                                                  | Swap rows of the current table by using row index. The function will do nothing if one of the parameters is bigger than the size of the table. |
+| `void SwapRow(iterator _RowIt1, iterator _RowIt2)`                                                                                                                                                                                                                    | Swap rows of the current table by using iterator. The function will do nothing if one of the iterators is not pointing to the table.           |
+| `iterator NewRow()`                                                                                                                                                                                                                                                   | Add and empty row at the last of the table. The row should have the same columns of the table.                                                 |
+| `typename BasicCsvRow<CharT>::iterator EraseColumn(typename BasicCsvRow<CharT>::iterator _ErasePosition)`<p></p>`typename BasicCsvRow<CharT>::iterator EraseColumn(IndexT _ErasePosition)`                                                                            | Erase a column which iterator `ErasePosition` is pointing at header.                                                                           |
+| `typename BasicCsvRow<CharT>::iterator EraseColumn(typename BasicCsvRow<CharT>::iterator _FirstPosition, typename BasicCsvRow<CharT>::iterator _LastPosition)`<p></p>`typename BasicCsvRow<CharT>::iterator EraseColumn(IndexT _FirstPosition, IndexT _LastPosition)` | Erase the columns in range `[_FromPosition, _LastPosition)`.                                                                                   |
 
 ##### 2. Non member methods
 
