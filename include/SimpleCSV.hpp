@@ -1,20 +1,6 @@
 /*
  *          Simple CSV Master
  *          
- *          v0.0.1  正式版
- *          v0.0.2  修改了Format(CsvFomat _format)读入时的规则
- *          v0.1.0  模板化CsvRow及CsvTable类
- *          v0.1.1  去掉了BasicCsvRow及BasicCsvTable析构函数中显式调用std::vector()::~vector()的部分
- *          v0.1.2  排除空行；修改BasicCsvTable的CsvFormat后修改所有内部CsvRow的Format属性；补齐或修剪
- *                  列数使与表头相等
- *          v0.2.0  完成重写所有使元素增减的修改器（insert，emplace，erase，push_back，emplace_back。
- *          v0.2.1  重写部分构造函数。
- *          v0.2.2  增加行swap()函数，增加SwapRow()函数。
- *          v0.2.3  重写了assign()函数。重写了operator=()函数, 重写copy ctor和move ctor。
- *          v0.2.4  增加NewRow()函数。
- *          v0.2.5  解决无法调用BasicCsvRow.operator[](size_t index)的问题。
- *          v0.2.6  简化表格读入的代码，修复指定列范围时，读入残余的问题。
- *          v0.3.0  增加BasicCsvColumn类，用以表示CSV表格中的行。BAsicCsvTable增加EraseColumn()函数。
  * 
  */
 
@@ -182,12 +168,12 @@ namespace SimpleCSV
         BasicCsvTable(const BasicCsvTable<CharT> &_CsvTable) : vector<BasicCsvRow<CharT>>(_CsvTable)
         {
             Format_ = _CsvTable.Format_;
-            Columns_ = _CsvTable.Columns;
+            Columns_ = _CsvTable.Columns_;
         }
-        BasicCsvTable(BasicCsvTable &&_CsvTable) : vector<BasicCsvRow<CharT>>(std::move(_CsvTable))
+        BasicCsvTable(BasicCsvTable &&_CsvTable) : vector<BasicCsvRow<CharT>>(/* std::move */ (_CsvTable))
         {
             Format_ = std::move(_CsvTable.Format_);
-            Columns_ = _CsvTable.Columns;
+            Columns_ = _CsvTable.Columns_;
         }
         ~BasicCsvTable() noexcept {}
 
@@ -256,6 +242,11 @@ namespace SimpleCSV
         void SwapRow(typename BasicCsvTable<CharT>::iterator _RowIt1,
                      typename BasicCsvTable<CharT>::iterator _RowIt2);
 
+        // typename BasicCsvRow<CharT>::iterator InsertColumn(
+        //     typename BasicCsvRow<CharT>::iterator _FromFirstPosition,
+        //     typename BasicCsvRow<CharT>::iterator _FromLastPosition
+        // );
+
         typename BasicCsvRow<CharT>::iterator EraseColumn(
             typename BasicCsvRow<CharT>::iterator _ErasePosition);
         typename BasicCsvRow<CharT>::iterator EraseColumn(
@@ -303,7 +294,13 @@ namespace SimpleCSV
     inline const std::basic_string<CharT> &BasicCsvRow<CharT>::operator[](
         const std::basic_string<CharT> &_FieldName) const
     {
-        return this->operator[](_FieldName);
+        auto CsvRowHead = this - RowIndex_;
+        for (auto ItCsvRow = CsvRowHead->begin(); ItCsvRow < CsvRowHead->end(); ++ItCsvRow)
+        {
+            if (*ItCsvRow == _FieldName)
+                return *(this->begin() + (ItCsvRow - CsvRowHead->begin()));
+        }
+        return *(this->end());
     }
 
     //SECTION: class BasicCsvTable method implementation
@@ -634,14 +631,16 @@ namespace SimpleCSV
     template <class CharT>
     inline typename BasicCsvRow<CharT>::iterator BasicCsvTable<CharT>::EraseColumn(IndexT _ErasePosition)
     {
-        return this->EraseColumn(this->begin() + _ErasePosition, this->begin() + _ErasePosition + 1);
+        return this->EraseColumn(this->front().begin() + _ErasePosition,
+                                 this->front().begin() + _ErasePosition + 1);
     }
 
     template <class CharT>
     inline typename BasicCsvRow<CharT>::iterator BasicCsvTable<CharT>::EraseColumn(
         IndexT _FirstPosition, IndexT _LastPosition)
     {
-        return this->EraseColumn(this->begin() + _FirstPosition, this->begin() + _LastPosition);
+        return this->EraseColumn(this->front().begin() + _FirstPosition,
+                                 this->front().begin() + _LastPosition);
     }
 
     //SECTION: other non member mothods
@@ -721,7 +720,8 @@ namespace SimpleCSV
                           _CsvRow.Format().Delimeter_.size();
             }
         } while (EndlineFlag);
-        _CsvRow.erase(_CsvRow.begin() + _CsvRow.Range().CountColumns_, _CsvRow.end());
+        if (_CsvRow.Range().CountColumns_ < _CsvRow.size())
+            _CsvRow.erase(_CsvRow.begin() + _CsvRow.Range().CountColumns_, _CsvRow.end());
         return is;
     }
 
@@ -791,3 +791,21 @@ namespace SimpleCSV
 }
 
 #endif //__SIMPLECSV_HPP
+       /* 
+ *          v0.0.1  正式版
+ *          v0.0.2  修改了Format(CsvFomat _format)读入时的规则
+ *          v0.1.0  模板化CsvRow及CsvTable类
+ *          v0.1.1  去掉了BasicCsvRow及BasicCsvTable析构函数中显式调用std::vector()::~vector()的部分
+ *          v0.1.2  排除空行；修改BasicCsvTable的CsvFormat后修改所有内部CsvRow的Format属性；补齐或修剪
+ *                  列数使与表头相等
+ *          v0.2.0  完成重写所有使元素增减的修改器（insert，emplace，erase，push_back，emplace_back。
+ *          v0.2.1  重写部分构造函数。
+ *          v0.2.2  增加行swap()函数，增加SwapRow()函数。
+ *          v0.2.3  重写了assign()函数。重写了operator=()函数, 重写copy ctor和move ctor。
+ *          v0.2.4  增加NewRow()函数。
+ *          v0.2.5  解决无法调用BasicCsvRow.operator[](size_t index)的问题。
+ *          v0.2.6  简化表格读入的代码，修复指定列范围时，读入残余的问题。
+ *          v0.3.0  增加BasicCsvColumn类，用以表示CSV表格中的行。BAsicCsvTable增加EraseColumn()函数。
+ *          v0.3.1  Bugfix: 解决行读取后可能整行删除的问题；解决BasicCsvRow<CharT>::operator[]()可能进入递归的问题。
+ *  
+ */
