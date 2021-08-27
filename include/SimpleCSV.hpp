@@ -152,7 +152,7 @@ namespace SimpleCSV
             : vector<BasicCsvRow<CharT>>(),
               Range_(_range) { Format(_format); }
         BasicCsvTable(IndexT _Row, const BasicCsvRow<CharT> &_CsvRow) noexcept
-            : vector<BasicCsvRow<CharT>>(_Row, _CsvRow) noexcept
+            : vector<BasicCsvRow<CharT>>(_Row, _CsvRow)
         {
             ModifyRow(this->begin(), this->cbegin(), 0);
         }
@@ -312,8 +312,8 @@ namespace SimpleCSV
         IndexT _Count)
     {
         auto itpos = _ItPos;
-        if (front().size())
-            Columns_ = front().size();
+        if (this->front().size())
+            Columns_ = this->front().size();
         for (IndexT ItPosSize = itpos->size(); itpos < _Position + _Count; ++itpos)
         {
             itpos->Format(Format_);
@@ -392,7 +392,7 @@ namespace SimpleCSV
     inline const BasicCsvTable<CharT> &BasicCsvTable<CharT>::operator=(
         std::initializer_list<BasicCsvRow<CharT>> _CsvRowList)
     {
-        vector<BasicCSvRow<CharT>>::operator=(_CsvRowList);
+        vector<BasicCsvRow<CharT>>::operator=(_CsvRowList);
         ModifyRow(this->begin(), this->begin(), 0);
         return *this;
     }
@@ -560,7 +560,7 @@ namespace SimpleCSV
         if (this->size() < _Count)
         {
             vector<BasicCsvRow<CharT>>::resize(_Count, _CsvRow);
-            ModifyRow(end() - _Count, end() - _Count, _Count);
+            ModifyRow(this->end() - _Count, this->end() - _Count, _Count);
         }
         else
             vector<BasicCsvRow<CharT>>::resize(_Count, _CsvRow);
@@ -807,5 +807,6 @@ namespace SimpleCSV
  *          v0.2.6  简化表格读入的代码，修复指定列范围时，读入残余的问题。
  *          v0.3.0  增加BasicCsvColumn类，用以表示CSV表格中的行。BAsicCsvTable增加EraseColumn()函数。
  *          v0.3.1  Bugfix: 解决行读取后可能整行删除的问题；解决BasicCsvRow<CharT>::operator[]()可能进入递归的问题。
+ *          v0.3.2  修改部分代码以通过gcc编译测试。
  *  
  */
