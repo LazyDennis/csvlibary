@@ -127,14 +127,14 @@ Public methods are as below
 
 ##### 1. Public Member Methods
 
-| Method                                                       | Usage                                                        |
-| :----------------------------------------------------------- | :----------------------------------------------------------- |
-| `CsvRow()`                                                   | Default constructor to construct a variable of CsvRow        |
-| `CsvRow(const CsvRange &_range, const CsvFormat &_format) noexcept` | Customized range and format can be set by using this constructor to initialize a CsvRow Variable. |
-| `void Range(const CsvRange &_range) noexcept`<p></p>`const CsvRange &Range() const noexcept` | Use `.Range(range)` to set range property or use `.Range()` to get current range property. |
-| `template <class CharT> void Format<CharT>(const CsvFormat &_format) noexcept`<p></p>`template <class CharT> const CsvFormat<CharT> &Format() const noexcept` | Use `.Format(format)` to set format property or use `.Format()` to get current format property. |
-| `void Row(IndexT _row) noexcept` <p></p>`IndexT Row() const noexcept` | Use `.Row(row)` to set a row number for a BasicCsvRow object, or use `.Row()` to get current row number. |
-| `template <class CharT> std::basic_string<CharT> &operator[](const std::basic_string<CharT> &_FieldName)` | Use a header string to find a specified elements of a row. A `*end()` will be returned if the string is not found. |
+| Method                                                                                                                                                                                                                                | Usage                                                                                                                                      |
+| :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | :----------------------------------------------------------------------------------------------------------------------------------------- |
+| `CsvRow()`                                                                                                                                                                                                                            | Default constructor to construct a variable of CsvRow                                                                                      |
+| `CsvRow(const CsvRange &_range, const CsvFormat &_format) noexcept`                                                                                                                                                                   | Customized range and format can be set by using this constructor to initialize a CsvRow Variable.                                          |
+| `void Range(const CsvRange &_range) noexcept`<p></p>`const CsvRange &Range() const noexcept`                                                                                                                                          | Use `.Range(range)` to set range property or use `.Range()` to get current range property.                                                 |
+| `template <class CharT> void Format<CharT>(const CsvFormat &_format) noexcept`<p></p>`template <class CharT> const CsvFormat<CharT> &Format() const noexcept`                                                                         | Use `.Format(format)` to set format property or use `.Format()` to get current format property.                                            |
+| `void Row(IndexT _row) noexcept` <p></p>`IndexT Row() const noexcept`                                                                                                                                                                 | Use `.Row(row)` to set a row number for a BasicCsvRow object, or use `.Row()` to get current row number.                                   |
+| `template <class CharT> std::basic_string<CharT> &operator[](const std::basic_string<CharT> &_FieldName)`<p></p>`template <class CharT> const std::basic_string<CharT> &operator[](const std::basic_string<CharT> &_FieldName) const` | Use a header string to find a specified elements of a row. A `std::invalid_argument` excpetion will be throwed if the string is not found. |
 
 ##### 2. Non member methods
 

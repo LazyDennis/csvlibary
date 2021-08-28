@@ -99,7 +99,7 @@ namespace SimpleCSV
     class BasicCsvRow : public vector<std::basic_string<CharT>>
     {
     private:
-        IndexT RowIndex_;
+        IndexT RowIndex_ = 0;
         CsvRange Range_;
         CsvFormat<CharT> Format_;
         friend BasicCsvTable<CharT>;
@@ -137,7 +137,7 @@ namespace SimpleCSV
     private:
         CsvRange Range_;
         CsvFormat<CharT> Format_;
-        IndexT Columns_; //Header_的列数
+        IndexT Columns_ = 0; //Header_的列数
         friend BasicCsvRow<CharT>;
 
         void ModifyRow(
@@ -287,7 +287,7 @@ namespace SimpleCSV
             if (*ItCsvRow == _FieldName)
                 return *(this->begin() + (ItCsvRow - CsvRowHead->begin()));
         }
-        return *(this->end());
+        throw std::invalid_argument("Invalid header.");
     }
 
     template <class CharT>
@@ -300,7 +300,7 @@ namespace SimpleCSV
             if (*ItCsvRow == _FieldName)
                 return *(this->begin() + (ItCsvRow - CsvRowHead->begin()));
         }
-        return *(this->end());
+        throw std::invalid_argument("Invalid header.");
     }
 
     //SECTION: class BasicCsvTable method implementation
@@ -618,10 +618,11 @@ namespace SimpleCSV
             _LastPosition <= this->front().end())
         {
             auto fpos = _FirstPosition, lpos = _LastPosition;
+            auto fdiff = _FirstPosition - this->front ().begin (), ldiff = _LastPosition - this->front ().begin ();
             for (auto &itPos : *this)
             {
-                fpos = itPos.begin() + (_FirstPosition - this->front().begin());
-                lpos = itPos.begin() + (_LastPosition - this->front().begin());
+                fpos = itPos.begin() + fdiff;
+                lpos = itPos.begin() + ldiff;
                 itPos.erase(fpos, lpos);
             }
         }
@@ -650,7 +651,7 @@ namespace SimpleCSV
                        const std::basic_string<CharT> &_deli) noexcept
     {
         auto itDeli = _deli.begin();
-        while (*_it == *itDeli)
+        while (itDeli != _deli.end() && *_it == *itDeli)
             _it++, itDeli++;
         return (itDeli == _deli.end());
     }
@@ -682,8 +683,8 @@ namespace SimpleCSV
                     else
                         it2 = it1;
                     while (!(*it2 == _CsvRow.Format().Quote_ &&
-                             (IsDeli(it2 + 1, _CsvRow.Format().Delimeter_) ||
-                              it2 >= StrSource.end() - 1))) // 当前字节为quote_char且下一部分为Delimeter_或字符结束，说明字符已结束
+                             (it2 >= StrSource.end() - 1 ||
+                              IsDeli(it2 + 1, _CsvRow.Format().Delimeter_)))) // 当前字节为quote_char且下一部分为Delimeter_或字符结束，说明字符已结束
                     {
                         if (*it2 == _CsvRow.Format().Quote_ && *(it2 + 1) == _CsvRow.Format().Quote_)
                             StrSource.erase(it2);
@@ -714,10 +715,32 @@ namespace SimpleCSV
                     _CsvRow.emplace_back(it1, it2);
                     ++column;
                 }
-                it1 = it2 +
-                      (it2 != StrSource.end()) +
-                      (*it2 == _CsvRow.Format().Quote_ && IsDeli(it2 + 1, _CsvRow.Format().Delimeter_)) *
-                          _CsvRow.Format().Delimeter_.size();
+                if (it2 != StrSource.end())
+                {
+                    if (*it2 == _CsvRow.Format().Quote_)
+                    {
+                        if (it2 == StrSource.end() - 1)
+                        {
+                            it1 = it2 + 1;
+                        }
+                        else
+                        {
+                            it1 = it2 + 1 + _CsvRow.Format().Delimeter_.size();
+                        }
+                    }
+                    else
+                        it1 = it2 + 1;
+                }
+                else
+                {
+                    it1 = StrSource.end();
+                }
+                // it1 = it2 +
+                //       (it2 != StrSource.end()) +
+                //       (*it2 == _CsvRow.Format().Quote_ &&
+                //           (it2 >= StrSource.end () - 1 ||
+                //               IsDeli(it2 + 1, _CsvRow.Format().Delimeter_))) *
+                //           _CsvRow.Format().Delimeter_.size();
             }
         } while (EndlineFlag);
         if (_CsvRow.Range().CountColumns_ < _CsvRow.size())
@@ -791,7 +814,7 @@ namespace SimpleCSV
 }
 
 #endif //__SIMPLECSV_HPP
-       /* 
+/* 
  *          v0.0.1  正式版
  *          v0.0.2  修改了Format(CsvFomat _format)读入时的规则
  *          v0.1.0  模板化CsvRow及CsvTable类
@@ -808,5 +831,7 @@ namespace SimpleCSV
  *          v0.3.0  增加BasicCsvColumn类，用以表示CSV表格中的行。BAsicCsvTable增加EraseColumn()函数。
  *          v0.3.1  Bugfix: 解决行读取后可能整行删除的问题；解决BasicCsvRow<CharT>::operator[]()可能进入递归的问题。
  *          v0.3.2  修改部分代码以通过gcc编译测试。
+ *          v0.3.3  Bugfix: 读行最后字符为\"时，报错中断。修改BasicCsvRow<CharT>::operator[]，未找到对应header时，
+                    抛出std::invalid_argument异常。
  *  
  */
