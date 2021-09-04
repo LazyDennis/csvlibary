@@ -42,19 +42,19 @@ namespace SimpleCSV
 
     template <class CharT>
     bool IsDeli(const typename std::basic_string<CharT>::iterator _it,
-        const std::basic_string<CharT> &_deli) noexcept;
+                const std::basic_string<CharT> &_deli) noexcept;
     template <class CharT>
     std::basic_istream<CharT> &operator>>(std::basic_istream<CharT> &is,
-        BasicCsvRow<CharT> &_CsvRow);
+                                          BasicCsvRow<CharT> &_CsvRow);
     template <class CharT>
     std::basic_ostream<CharT> &operator<<(std::basic_ostream<CharT> &os,
-        const BasicCsvRow<CharT> &_CsvRow);
+                                          const BasicCsvRow<CharT> &_CsvRow);
     template <class CharT>
     std::basic_istream<CharT> &operator>>(std::basic_istream<CharT> &is,
-        BasicCsvTable<CharT> &_CsvTable);
+                                          BasicCsvTable<CharT> &_CsvTable);
     template <class CharT>
     std::basic_ostream<CharT> &operator<<(std::basic_ostream<CharT> &os,
-        const BasicCsvTable<CharT> &_CsvTable);
+                                          const BasicCsvTable<CharT> &_CsvTable);
 
     struct CsvRange
     {
@@ -64,12 +64,12 @@ namespace SimpleCSV
         IndexT CountColumns_; //读入文件文件的列数
 
         CsvRange(IndexT _header = 0,
-            IndexT _CountRows = nIndex,
-            IndexT _index = 0,
-            IndexT _CountColumns = nIndex) : Header_(_header),
-            CountRows_(_CountRows),
-            Index_(_index),
-            CountColumns_(_CountColumns) {}
+                 IndexT _CountRows = nIndex,
+                 IndexT _index = 0,
+                 IndexT _CountColumns = nIndex) : Header_(_header),
+                                                  CountRows_(_CountRows),
+                                                  Index_(_index),
+                                                  CountColumns_(_CountColumns) {}
     }; //struct CsvRange
 
     template <class CharT>
@@ -80,9 +80,9 @@ namespace SimpleCSV
         CharT Endline_;                      //换行符
 
         CsvFormat(std::basic_string<CharT> _delimeter = DFL_DELI<CharT>,
-            CharT _quote = DFL_QUOTE<CharT>) : Delimeter_(_delimeter),
-            Quote_(_quote),
-            Endline_(DFL_ENDLINE<CharT>) {}
+                  CharT _quote = DFL_QUOTE<CharT>) : Delimeter_(_delimeter),
+                                                     Quote_(_quote),
+                                                     Endline_(DFL_ENDLINE<CharT>) {}
     }; // struct CsvFormat
 
     //SECTION: class BasicCsvColumn definition.
@@ -112,9 +112,9 @@ namespace SimpleCSV
 
         BasicCsvRow() = default;
         BasicCsvRow(const CsvRange &_range,
-            const CsvFormat<CharT> &_format) noexcept
+                    const CsvFormat<CharT> &_format) noexcept
             : vector<std::basic_string<CharT>>(),
-            Range_(_range)
+              Range_(_range)
         {
             Format(_format);
         }
@@ -136,40 +136,44 @@ namespace SimpleCSV
 
         bool operator==(const BasicCsvRow<CharT> &_csvrow) noexcept
         {
-            return vector<std::basic_string>(*this) == vector<std::basic_string>(_csvrow);
+            return vector<std::basic_string<CharT>>(*this) == vector<std::basic_string<CharT>>(_csvrow);
         }
 
         bool operator!=(const BasicCsvRow<CharT> &_csvrow) noexcept
         {
-            return vector<std::basic_string>(*this) != vector<std::basic_string>(_csvrow);
+            return vector<std::basic_string<CharT>>(*this) != vector<std::basic_string<CharT>>(_csvrow);
         }
         bool operator<(const BasicCsvRow<CharT> &_csvrow) noexcept
         {
-            return vector<std::basic_string>(*this) < vector<std::basic_string>(_csvrow);
+            return vector<std::basic_string<CharT>>(*this) < vector<std::basic_string<CharT>>(_csvrow);
         }
 
         bool operator>(const BasicCsvRow<CharT> &_csvrow) noexcept
         {
-            return vector<std::basic_string>(*this) > vector<std::basic_string>(_csvrow);
+            return vector<std::basic_string<CharT>>(*this) > vector<std::basic_string<CharT>>(_csvrow);
         }
 
         bool operator<=(const BasicCsvRow<CharT> &_csvrow) noexcept
         {
-            return vector<std::basic_string>(*this) <= vector<std::basic_string>(_csvrow);
+            return vector<std::basic_string<CharT>>(*this) <= vector<std::basic_string<CharT>>(_csvrow);
         }
 
         bool operator>=(const BasicCsvRow<CharT> &_csvrow) noexcept
         {
-            return vector<std::basic_string>(*this) >= vector<std::basic_string>(_csvrow);
+            return vector<std::basic_string<CharT>>(*this) >= vector<std::basic_string<CharT>>(_csvrow);
         }
-    };  //class BasicCsvRow
+    }; //class BasicCsvRow
 
     //SECTION:  class BasicCsvTable definition
     template <class CharT>
     class BasicCsvTable : public vector<BasicCsvRow<CharT>>
     {
     public:
-        enum class SortType { Ascend, Decend };
+        enum class SortType
+        {
+            Ascend,
+            Decend
+        };
         using CsvSortList = vector<std::pair<IndexT, SortType>>;
 
     private:
@@ -209,9 +213,9 @@ namespace SimpleCSV
     public:
         BasicCsvTable() = default;
         BasicCsvTable(const CsvRange &_range,
-            const CsvFormat<CharT> &_format) noexcept
+                      const CsvFormat<CharT> &_format) noexcept
             : vector<BasicCsvRow<CharT>>(),
-            Range_(_range)
+              Range_(_range)
         {
             Format(_format);
         }
@@ -223,14 +227,14 @@ namespace SimpleCSV
         }
         explicit BasicCsvTable(IndexT _Row, IndexT _Columns = 0) noexcept
             : vector<BasicCsvRow<CharT>>(_Row, BasicCsvRow<CharT>(_Columns)),
-            Columns_(_Columns)
+              Columns_(_Columns)
         {
             ModifyRow(this->begin(), this->cbegin(), 0);
         }
         BasicCsvTable(typename BasicCsvTable<CharT>::const_iterator _FromFirstPosition,
-            typename BasicCsvTable<CharT>::const_iterator _FromLastPosition) noexcept
+                      typename BasicCsvTable<CharT>::const_iterator _FromLastPosition) noexcept
             : vector<BasicCsvRow<CharT>>(_FromLastPosition,
-                _FromLastPosition)
+                                         _FromLastPosition)
         {
             ModifyRow(this->begin(), this->cbegin(), 0);
         }
@@ -297,7 +301,7 @@ namespace SimpleCSV
 
         void assign(IndexT _Count, const BasicCsvRow<CharT> &_CsvRow);
         void assign(typename BasicCsvTable<CharT>::const_iterator _FromFirstPosition,
-            typename BasicCsvTable<CharT>::const_iterator _FromLastPosition);
+                    typename BasicCsvTable<CharT>::const_iterator _FromLastPosition);
         void assign(std::initializer_list<BasicCsvRow<CharT>> _CsvRowList);
 
         typename BasicCsvTable<CharT>::iterator insert(
@@ -341,7 +345,7 @@ namespace SimpleCSV
 
         void SwapRow(IndexT _RowIndex1, IndexT _RowIndex2);
         void SwapRow(typename BasicCsvTable<CharT>::iterator _RowIt1,
-            typename BasicCsvTable<CharT>::iterator _RowIt2);
+                     typename BasicCsvTable<CharT>::iterator _RowIt2);
 
         // typename BasicCsvRow<CharT>::iterator InsertColumn(
         //     typename BasicCsvRow<CharT>::iterator _FromFirstPosition,
@@ -372,7 +376,7 @@ namespace SimpleCSV
                 std::sort(this->begin(), this->end(), CsvRowComp(_SortList));
         }
 
-    };//class BasicCsvTable
+    }; //class BasicCsvTable
 
     //SECTION: class BasicCsvRow method implementation
 
@@ -384,7 +388,7 @@ namespace SimpleCSV
             Format_.Delimeter_ = DFL_DELI<CharT>;
         if (Format_.Quote_ == 0 ||
             (Format_.Delimeter_.size() < 2 &&
-                Format_.Delimeter_.front() == Format_.Quote_))
+             Format_.Delimeter_.front() == Format_.Quote_))
         {
             if (Format_.Quote_ == DFL_QUOTE<CharT>)
                 Format_.Delimeter_ = DFL_DELI<CharT>;
@@ -423,8 +427,8 @@ namespace SimpleCSV
     //SECTION: class BasicCsvTable method implementation
 
     template <class CharT>
-    bool BasicCsvTable<CharT>::CsvRowComp::operator()(const BasicCsvRow<CharT> _csvrowl, 
-        const BasicCsvRow<CharT> _csvrowr)
+    bool BasicCsvTable<CharT>::CsvRowComp::operator()(const BasicCsvRow<CharT> _csvrowl,
+                                                      const BasicCsvRow<CharT> _csvrowr)
     {
         if (_csvrowl.size() != _csvrowr.size() || SortList_.empty())
             return _csvrowl < _csvrowr;
@@ -536,7 +540,7 @@ namespace SimpleCSV
             Format_.Delimeter_ = DFL_DELI<CharT>;
         if (Format_.Quote_ == 0 ||
             Format_.Delimeter_.size() < 2 &&
-            Format_.Delimeter_.front() == Format_.Quote_)
+                Format_.Delimeter_.front() == Format_.Quote_)
         {
             if (Format_.Quote_ == DFL_QUOTE<CharT>)
                 Format_.Delimeter_ = DFL_DELI<CharT>;
@@ -567,9 +571,9 @@ namespace SimpleCSV
         const std::basic_string<CharT> &_fieldname) const noexcept
     {
         if (~Range_.Header_)
-            for (auto HeadIt = this->cbegin()->cbegin(); 
-                HeadIt < this->cbegin()->cend(); 
-                ++HeadIt)
+            for (auto HeadIt = this->cbegin()->cbegin();
+                 HeadIt < this->cbegin()->cend();
+                 ++HeadIt)
                 if (_fieldname == *HeadIt)
                     return HeadIt - this->cbegin()->cbegin();
         return nIndex;
@@ -757,7 +761,7 @@ namespace SimpleCSV
 
     template <class CharT>
     inline void BasicCsvTable<CharT>::resize(IndexT _Count,
-        const BasicCsvRow<CharT> &_CsvRow)
+                                             const BasicCsvRow<CharT> &_CsvRow)
     {
         if (this->size() < _Count)
         {
@@ -822,7 +826,7 @@ namespace SimpleCSV
         {
             auto fpos = _FirstPosition, lpos = _LastPosition;
             auto fdiff = _FirstPosition - this->front().begin(),
-                ldiff = _LastPosition - this->front().begin();
+                 ldiff = _LastPosition - this->front().begin();
             for (auto &itPos : *this)
             {
                 fpos = itPos.begin() + fdiff;
@@ -838,7 +842,7 @@ namespace SimpleCSV
         IndexT _ErasePosition)
     {
         return this->EraseColumn(this->front().begin() + _ErasePosition,
-            this->front().begin() + _ErasePosition + 1);
+                                 this->front().begin() + _ErasePosition + 1);
     }
 
     template <class CharT>
@@ -846,14 +850,14 @@ namespace SimpleCSV
         IndexT _FirstPosition, IndexT _LastPosition)
     {
         return this->EraseColumn(this->front().begin() + _FirstPosition,
-            this->front().begin() + _LastPosition);
+                                 this->front().begin() + _LastPosition);
     }
 
     //SECTION: other non member mothods
 
     template <class CharT>
     inline bool IsDeli(typename std::basic_string<CharT>::iterator _it,
-        const std::basic_string<CharT> &_deli) noexcept
+                       const std::basic_string<CharT> &_deli) noexcept
     {
         auto itDeli = _deli.begin();
         while (itDeli != _deli.end() && *_it == *itDeli)
@@ -861,10 +865,9 @@ namespace SimpleCSV
         return (itDeli == _deli.end());
     }
 
-
     template <class CharT>
     std::basic_istream<CharT> &operator>>(std::basic_istream<CharT> &is,
-        BasicCsvRow<CharT> &_CsvRow)
+                                          BasicCsvRow<CharT> &_CsvRow)
     {
         IndexT column = 0, loadedcolumn = 0;
         bool EndlineFlag = false;
@@ -889,16 +892,16 @@ namespace SimpleCSV
                     else
                         it2 = it1;
                     while (!(*it2 == _CsvRow.Format().Quote_ &&
-                        (it2 >= StrSource.end() - 1 ||
-                            IsDeli(it2 + 1, _CsvRow.Format().Delimeter_)))) // 当前字节为quote_char且下一部分为Delimeter_或字符结束，说明字符已结束
+                             (it2 >= StrSource.end() - 1 ||
+                              IsDeli(it2 + 1, _CsvRow.Format().Delimeter_)))) // 当前字节为quote_char且下一部分为Delimeter_或字符结束，说明字符已结束
                     {
                         if (*it2 == _CsvRow.Format().Quote_ && *(it2 + 1) == _CsvRow.Format().Quote_)
                             StrSource.erase(it2);
                         if (it2 >= StrSource.end() - 1) // 内容中存在换行
                         {
                             StrTmp = _CsvRow.Format().Quote_ +
-                                std::basic_string<CharT>(it1, it2 + 1) +
-                                _CsvRow.Format().Endline_; //已处理的内容临时存放于于StrTmp中
+                                     std::basic_string<CharT>(it1, it2 + 1) +
+                                     _CsvRow.Format().Endline_; //已处理的内容临时存放于于StrTmp中
                             EndlineFlag = true;                 //设置换行标记
                             break;
                         }
@@ -916,7 +919,7 @@ namespace SimpleCSV
                 }
                 if (!EndlineFlag &&
                     (_CsvRow.Range().Index_ == nIndex ||
-                        loadedcolumn++ >= _CsvRow.Range().Index_))
+                     loadedcolumn++ >= _CsvRow.Range().Index_))
                 {
                     _CsvRow.emplace_back(it1, it2);
                     ++column;
@@ -956,7 +959,7 @@ namespace SimpleCSV
 
     template <class CharT>
     std::basic_ostream<CharT> &operator<<(std::basic_ostream<CharT> &os,
-        const BasicCsvRow<CharT> &_CsvRow)
+                                          const BasicCsvRow<CharT> &_CsvRow)
     {
         bool HasSpecialChar = false;
         std::basic_string<CharT> StrTmp;
@@ -988,7 +991,7 @@ namespace SimpleCSV
 
     template <class CharT>
     std::basic_istream<CharT> &operator>>(std::basic_istream<CharT> &is,
-        BasicCsvTable<CharT> &_CsvTable)
+                                          BasicCsvTable<CharT> &_CsvTable)
     {
         IndexT /* row = _CsvTable.size(), */ loadedline = 0;
         BasicCsvRow<CharT> CsvRow_tmp(_CsvTable.Range(), _CsvTable.Format());
@@ -1010,7 +1013,7 @@ namespace SimpleCSV
 
     template <class CharT>
     std::basic_ostream<CharT> &operator<<(std::basic_ostream<CharT> &os,
-        const BasicCsvTable<CharT> &_CsvTable)
+                                          const BasicCsvTable<CharT> &_CsvTable)
     {
         for (auto itTable = _CsvTable.cbegin(); itTable < _CsvTable.end(); ++itTable)
         {
@@ -1023,7 +1026,7 @@ namespace SimpleCSV
 } //namespace SimpleCSV
 
 #endif //__SIMPLECSV_HPP
-/*
+       /*
  *          v0.0.1  正式版
  *          v0.0.2  修改了Format(CsvFomat _format)读入时的规则
  *          v0.1.0  模板化CsvRow及CsvTable类
@@ -1041,7 +1044,8 @@ namespace SimpleCSV
  *          v0.3.1  Bugfix: 解决行读取后可能整行删除的问题；解决BasicCsvRow<CharT>::operator[]()可能进入递归的问题。
  *          v0.3.2  修改部分代码以通过gcc编译测试。
  *          v0.3.3  Bugfix: 读行最后字符为\"时，报错中断。修改BasicCsvRow<CharT>::operator[]，未找到对应header时，
-                    抛出std::invalid_argument异常。
-            v0.4.0  增加比较运算符。增加排序方法BasicCsvTable::sort()。
+ *                  抛出std::invalid_argument异常。
+ *          v0.4.0  增加比较运算符。增加排序方法BasicCsvTable::sort()。
+ *          v0.4.1  修复一些错误。
  *
  */
