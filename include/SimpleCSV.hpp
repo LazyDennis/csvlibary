@@ -116,7 +116,7 @@ namespace SimpleCSV
             : vector<std::basic_string<CharT>>(),
               Range_(_range)
         {
-            Format(_format);
+            this->Format(_format);
         }
 
         ~BasicCsvRow() noexcept {}
@@ -217,7 +217,7 @@ namespace SimpleCSV
             : vector<BasicCsvRow<CharT>>(),
               Range_(_range)
         {
-            Format(_format);
+            this->Format(_format);
         }
 
         BasicCsvTable(IndexT _Row, const BasicCsvRow<CharT> &_CsvRow) noexcept

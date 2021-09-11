@@ -1,12 +1,36 @@
-<font size = 6>**Simple CSV libary for modern C++**</font>
+<font size = 7>**Simple CSV libary for modern C++**</font>
 
 This is a CSV(Comma-Separated Values) libary for simple use of reading / writing csv files
 
 ---
 
-[TOC]
-
-# Description
+- [Features](#features)
+- [Introduction](#introduction)
+  - [Namespace](#namespace)
+  - [Defined Variable type](#defined-variable-type)
+  - [Global Variable](#global-variable)
+  - [Main Class](#main-class)
+  - [Public Type](#public-type)
+    - [enum class SortType](#enum-class-sorttype)
+    - [CsvSortList](#csvsortlist)
+  - [Public Methods](#public-methods)
+    - [struct CsvRange](#struct-csvrange)
+    - [struct Format](#struct-format)
+    - [class CsvRow](#class-csvrow)
+      - [1. Public Member Methods](#1-public-member-methods)
+      - [2. Non member methods](#2-non-member-methods)
+    - [class CsvTable](#class-csvtable)
+      - [1. Public Member Methods](#1-public-member-methods-1)
+      - [2. Non member methods](#2-non-member-methods-1)
+- [Usage](#usage)
+    - [1. Initialize an object.](#1-initialize-an-object)
+    - [2. Reading and writing a csv file.](#2-reading-and-writing-a-csv-file)
+    - [3. Setting a special format to process a CSV file](#3-setting-a-special-format-to-process-a-csv-file)
+    - [4. Setting read-range when reading a CSV file](#4-setting-read-range-when-reading-a-csv-file)
+    - [5. Operate a specified cell of the table](#5-operate-a-specified-cell-of-the-table)
+    - [6. Sort rows in a table](#6-sort-rows-in-a-table)
+- [License](#license)
+- [Update Log](#update-log)
 
 This is a CSV libary written by `C++`. It can be used to read or write CSV files. By inheriting `std::vector` class of `C++` standard libary, there are two main classes in the libary, included in namespace `SimpleCSV`. I am going show how to use the libary below.
 Delimeter and escape character can be customized, and `','` as delimeter , `'\"'` as escape character and `'\n'` as newline, are set as default. Multiple characters of delimeter is supported in this libary.
@@ -339,3 +363,4 @@ This project is licensed under the terms of the MIT license.
 | v0.3.3  | Bugfix: Fixed the problem that program was haulted if a row ended with `\"`.<p></p>Modified `BasicCsvRow<CharT>::operator[]()`，an exception `std::invalid_argument` would be throw when the header input was not found. |
 | v0.4.0  | Comparision operator added. Sorting method `BasicCsvTable::sort()` addded.                                                                                                                                               |
 | v0.4.1  | Bugfix: Fixed some problem.                                                                                                                                                                                              |
+| v0.4.2  | Minor changes.                                                                                                                                                                                                           |
