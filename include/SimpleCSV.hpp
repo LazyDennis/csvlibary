@@ -58,10 +58,10 @@ namespace SimpleCSV
 
     struct CsvRange
     {
-        IndexT Header_;       //è¯»å…¥æ–‡ä»¶çš„ç¬¬Header_è¡Œä¸ºè¡¨å¤´ï¼Œ-1æ—¶ä¸ºæ— è¡¨å¤´ï¼Œé»˜è®¤0ï¼ˆç¬¬ä¸€è¡Œï¼‰,ç¬¬Header_è¡Œå‰çš„æ•°æ®ä¼šè¢«ä¸¢å¼ƒ
-        IndexT CountRows_;    //è¯»å…¥æ–‡ä»¶çš„è¡Œæ•°ï¼Œå³è¯»å…¥æ–‡ä»¶çš„è¡ŒèŒƒå›´[Header_, Header_ + CountRows_)çš„å†…å®¹
-        IndexT Index_;        //æ–‡ä»¶çš„ç¬¬Index_åˆ—ä¸ºèµ·å§‹åˆ—
-        IndexT CountColumns_; //è¯»å…¥æ–‡ä»¶æ–‡ä»¶çš„åˆ—æ•°
+        IndexT Header_;       //¶ÁÈëÎÄ¼şµÄµÚHeader_ĞĞÎª±íÍ·£¬-1Ê±ÎªÎŞ±íÍ·£¬Ä¬ÈÏ0£¨µÚÒ»ĞĞ£©,µÚHeader_ĞĞÇ°µÄÊı¾İ»á±»¶ªÆú
+        IndexT CountRows_;    //¶ÁÈëÎÄ¼şµÄĞĞÊı£¬¼´¶ÁÈëÎÄ¼şµÄĞĞ·¶Î§[Header_, Header_ + CountRows_)µÄÄÚÈİ
+        IndexT Index_;        //ÎÄ¼şµÄµÚIndex_ÁĞÎªÆğÊ¼ÁĞ
+        IndexT CountColumns_; //¶ÁÈëÎÄ¼şÎÄ¼şµÄÁĞÊı
 
         CsvRange(IndexT _header = 0,
                  IndexT _CountRows = nIndex,
@@ -75,9 +75,9 @@ namespace SimpleCSV
     template <class CharT>
     struct CsvFormat
     {
-        std::basic_string<CharT> Delimeter_; //åˆ†éš”ç¬¦ï¼Œé»˜è®¤ ","ï¼Œæ”¯æŒå¤šå­—ç¬¦
-        CharT Quote_;                        //è½¬ä¹‰å­—ç¬¦
-        CharT Endline_;                      //æ¢è¡Œç¬¦
+        std::basic_string<CharT> Delimeter_; //·Ö¸ô·û£¬Ä¬ÈÏ ","£¬Ö§³Ö¶à×Ö·û
+        CharT Quote_;                        //×ªÒå×Ö·û
+        CharT Endline_;                      //»»ĞĞ·û
 
         CsvFormat(std::basic_string<CharT> _delimeter = DFL_DELI<CharT>,
                   CharT _quote = DFL_QUOTE<CharT>) : Delimeter_(_delimeter),
@@ -179,7 +179,7 @@ namespace SimpleCSV
     private:
         CsvRange Range_;
         CsvFormat<CharT> Format_;
-        IndexT Columns_ = 0; //Header_çš„åˆ—æ•°
+        IndexT Columns_ = 0; //Header_µÄÁĞÊı
 
         friend BasicCsvRow<CharT>;
 
@@ -257,12 +257,12 @@ namespace SimpleCSV
         const CsvRange &Range() const noexcept { return Range_; }
         const CsvFormat<CharT> &Format() const noexcept { return Format_; }
 
-        BasicCsvColumn<CharT> Column(IndexT _Index) const noexcept;                  //è¿”å›æŒ‡å®šåˆ—æ•´åˆ—æ•°æ®
-        IndexT HeadIndex(const std::basic_string<CharT> &_fieldname) const noexcept; //è¿”å›æŒ‡å®šå­—ç¬¦ä¸²åœ¨è¡¨å¤´ä¸­çš„ä½ç½®ï¼Œå¦‚æœæ²¡æœ‰è¡¨å¤´ï¼Œæˆ–æ²¡æœ‰æ‰¾åˆ°å­—ç¬¦ä¸²ï¼Œè¿”å›nIndex;
+        BasicCsvColumn<CharT> Column(IndexT _Index) const noexcept;                  //·µ»ØÖ¸¶¨ÁĞÕûÁĞÊı¾İ
+        IndexT HeadIndex(const std::basic_string<CharT> &_fieldname) const noexcept; //·µ»ØÖ¸¶¨×Ö·û´®ÔÚ±íÍ·ÖĞµÄÎ»ÖÃ£¬Èç¹ûÃ»ÓĞ±íÍ·£¬»òÃ»ÓĞÕÒµ½×Ö·û´®£¬·µ»ØnIndex;
 
-        IndexT Rows() const noexcept { return this->size(); }  //è¿”å›è¡Œæ•°
-        IndexT Columns() const noexcept { return Columns_; }   //è¿”å›åˆ—æ•°
-        void Columns(IndexT _Columns) { Columns_ = _Columns; } //è®¾ç½®åˆ—æ•°
+        IndexT Rows() const noexcept { return this->size(); }  //·µ»ØĞĞÊı
+        IndexT Columns() const noexcept { return Columns_; }   //·µ»ØÁĞÊı
+        void Columns(IndexT _Columns) { Columns_ = _Columns; } //ÉèÖÃÁĞÊı
         typename BasicCsvTable<CharT>::iterator NewRow();
 
         const BasicCsvTable<CharT> &operator=(std::initializer_list<BasicCsvRow<CharT>> _CsvRowList);
@@ -651,7 +651,7 @@ namespace SimpleCSV
         const BasicCsvRow<CharT> &_CsvRow)
     {
         auto ItPos = vector<BasicCsvRow<CharT>>::insert(_InsertPosition, _CsvRow);
-        ModifyRow(ItPos, _InsertPosition, 1);
+        ModifyRow(ItPos, ItPos, 1);
         return ItPos;
     }
 
@@ -661,7 +661,7 @@ namespace SimpleCSV
         BasicCsvRow<CharT> &&_CsvRow)
     {
         auto ItPos = vector<BasicCsvRow<CharT>>::insert(_InsertPosition, std::move(_CsvRow));
-        ModifyRow(ItPos, _InsertPosition, 1);
+        ModifyRow(ItPos, ItPos, 1);
         return ItPos;
     }
 
@@ -673,7 +673,7 @@ namespace SimpleCSV
     {
         auto ItPos = vector<BasicCsvRow<CharT>>::insert(
             _InsertPosition, _FromFirstPosition, _FromLastPosition);
-        ModifyRow(ItPos, _InsertPosition, (_FromLastPosition - _FromFirstPosition));
+        ModifyRow(ItPos, ItPos, (_FromLastPosition - _FromFirstPosition));
         return ItPos;
     }
 
@@ -683,7 +683,7 @@ namespace SimpleCSV
         IndexT _Count, const BasicCsvRow<CharT> &_CsvRow)
     {
         auto ItPos = vector<BasicCsvRow<CharT>>::insert(_InsertPosition, _Count, _CsvRow);
-        ModifyRow(ItPos, _InsertPosition, _Count);
+        ModifyRow(ItPos, ItPos, _Count);
         return ItPos;
     }
 
@@ -693,7 +693,7 @@ namespace SimpleCSV
         std::initializer_list<BasicCsvRow<CharT>> _CsvRowList)
     {
         auto ItPos = vector<BasicCsvRow<CharT>>::insert(_InsertPosition, _CsvRowList);
-        ModifyRow(ItPos, _InsertPosition, _CsvRowList.size());
+        ModifyRow(ItPos, ItPos, _CsvRowList.size());
         return ItPos;
     }
 
@@ -704,7 +704,7 @@ namespace SimpleCSV
         Args &&..._Args)
     {
         auto ItPos = vector<BasicCsvRow<CharT>>::emplace(std::forward<Args>(_Args)...);
-        ModifyRow(ItPos, _InsertPosition, 1);
+        ModifyRow(ItPos, ItPos, 1);
         return ItPos;
     }
 
@@ -713,7 +713,7 @@ namespace SimpleCSV
         typename BasicCsvTable<CharT>::const_iterator _ErasePosition)
     {
         auto ItPos = vector<BasicCsvRow<CharT>>::erase(_ErasePosition);
-        ModifyRow(ItPos, _ErasePosition, 0);
+        ModifyRow(ItPos, ItPos, 0);
         return ItPos;
     }
 
@@ -723,7 +723,7 @@ namespace SimpleCSV
         typename BasicCsvTable<CharT>::const_iterator _LastPosition)
     {
         auto ItPos = vector<BasicCsvRow<CharT>>::erase(_FirstPosition, _LastPosition);
-        ModifyRow(ItPos, _LastPosition, 0);
+        ModifyRow(ItPos, ItPos, 0);
         return ItPos;
     }
 
@@ -755,7 +755,7 @@ namespace SimpleCSV
     template <class CharT>
     inline void BasicCsvTable<CharT>::resize(IndexT _Count)
     {
-        resize(_Count, BasicCsvRow<CharT>(Columns_));
+        vector<BasicCsvRow<CharT>>::resize(_Count, BasicCsvRow<CharT>(Columns_));
         return;
     }
 
@@ -877,32 +877,32 @@ namespace SimpleCSV
         {
             getline(is, StrSource);
             if (EndlineFlag)
-                StrSource = StrTmp + StrSource; //å¦‚æœå†…å®¹åŒ…å«æ¢è¡Œï¼Œåˆ™æ·»åŠ ä¸Šæ¢è¡Œå‰çš„å†…å®¹
+                StrSource = StrTmp + StrSource; //Èç¹ûÄÚÈİ°üº¬»»ĞĞ£¬ÔòÌí¼ÓÉÏ»»ĞĞÇ°µÄÄÚÈİ
             it1 = it2 = StrSource.begin();
-            while (it1 != StrSource.end()) //å¯¹è¯»å…¥è¡Œè¿›è¡Œå¤„ç†
+            while (it1 != StrSource.end()) //¶Ô¶ÁÈëĞĞ½øĞĞ´¦Àí
             {
                 if (*it1 == _CsvRow.Format().Quote_)
                 {
                     ++it1;
                     if (EndlineFlag)
                     {
-                        it2 += StrTmp.size(); //ç›´æ¥ä»æ¢è¡Œåçš„å†…å®¹å¼€å§‹ï¼Œ
-                        EndlineFlag = false;  //å¯¹æ¢è¡Œå†…å®¹å¤„ç†å®Œæ¯•
+                        it2 += StrTmp.size(); //Ö±½Ó´Ó»»ĞĞºóµÄÄÚÈİ¿ªÊ¼£¬
+                        EndlineFlag = false;  //¶Ô»»ĞĞÄÚÈİ´¦ÀíÍê±Ï
                     }
                     else
                         it2 = it1;
                     while (!(*it2 == _CsvRow.Format().Quote_ &&
                              (it2 >= StrSource.end() - 1 ||
-                              IsDeli(it2 + 1, _CsvRow.Format().Delimeter_)))) // å½“å‰å­—èŠ‚ä¸ºquote_charä¸”ä¸‹ä¸€éƒ¨åˆ†ä¸ºDelimeter_æˆ–å­—ç¬¦ç»“æŸï¼Œè¯´æ˜å­—ç¬¦å·²ç»“æŸ
+                              IsDeli(it2 + 1, _CsvRow.Format().Delimeter_)))) // µ±Ç°×Ö½ÚÎªquote_charÇÒÏÂÒ»²¿·ÖÎªDelimeter_»ò×Ö·û½áÊø£¬ËµÃ÷×Ö·ûÒÑ½áÊø
                     {
                         if (*it2 == _CsvRow.Format().Quote_ && *(it2 + 1) == _CsvRow.Format().Quote_)
                             StrSource.erase(it2);
-                        if (it2 >= StrSource.end() - 1) // å†…å®¹ä¸­å­˜åœ¨æ¢è¡Œ
+                        if (it2 >= StrSource.end() - 1) // ÄÚÈİÖĞ´æÔÚ»»ĞĞ
                         {
                             StrTmp = _CsvRow.Format().Quote_ +
                                      std::basic_string<CharT>(it1, it2 + 1) +
-                                     _CsvRow.Format().Endline_; //å·²å¤„ç†çš„å†…å®¹ä¸´æ—¶å­˜æ”¾äºäºStrTmpä¸­
-                            EndlineFlag = true;                 //è®¾ç½®æ¢è¡Œæ ‡è®°
+                                     _CsvRow.Format().Endline_; //ÒÑ´¦ÀíµÄÄÚÈİÁÙÊ±´æ·ÅÓÚÓÚStrTmpÖĞ
+                            EndlineFlag = true;                 //ÉèÖÃ»»ĞĞ±ê¼Ç
                             break;
                         }
                         ++it2;
@@ -944,12 +944,6 @@ namespace SimpleCSV
                 {
                     it1 = StrSource.end();
                 }
-                // it1 = it2 +
-                //       (it2 != StrSource.end()) +
-                //       (*it2 == _CsvRow.Format().Quote_ &&
-                //           (it2 >= StrSource.end () - 1 ||
-                //               IsDeli(it2 + 1, _CsvRow.Format().Delimeter_))) *
-                //           _CsvRow.Format().Delimeter_.size();
             }
         } while (EndlineFlag);
         if (_CsvRow.Range().CountColumns_ < _CsvRow.size())
@@ -993,7 +987,7 @@ namespace SimpleCSV
     std::basic_istream<CharT> &operator>>(std::basic_istream<CharT> &is,
                                           BasicCsvTable<CharT> &_CsvTable)
     {
-        IndexT /* row = _CsvTable.size(), */ loadedline = 0;
+        IndexT loadedline = 0;
         BasicCsvRow<CharT> CsvRow_tmp(_CsvTable.Range(), _CsvTable.Format());
         do
         {
@@ -1001,7 +995,7 @@ namespace SimpleCSV
 
             if (!CsvRow_tmp.empty())
             {
-                if (_CsvTable.Range().Header_ == nIndex || loadedline++ >= _CsvTable.Range().Header_) //å¦‚æœHeader_ == nIndexï¼Œä¸ºæ²¡æœ‰Header_çš„æƒ…å†µï¼Œæ¯ä¸€è¡Œéƒ½è¢«è¯»å…¥ï¼›å¦‚æœloadedline >= Header_ï¼Œå¯ä»¥è¯»å…¥ä½™ä¸‹çš„è¡Œ
+                if (_CsvTable.Range().Header_ == nIndex || loadedline++ >= _CsvTable.Range().Header_) //Èç¹ûHeader_ == nIndex£¬ÎªÃ»ÓĞHeader_µÄÇé¿ö£¬Ã¿Ò»ĞĞ¶¼±»¶ÁÈë£»Èç¹ûloadedline >= Header_£¬¿ÉÒÔ¶ÁÈëÓàÏÂµÄĞĞ
                 {
                     _CsvTable.emplace_back(std::move(CsvRow_tmp));
                 }
@@ -1026,26 +1020,27 @@ namespace SimpleCSV
 } //namespace SimpleCSV
 
 #endif //__SIMPLECSV_HPP
-       /*
- *          v0.0.1  æ­£å¼ç‰ˆ
- *          v0.0.2  ä¿®æ”¹äº†Format(CsvFomat _format)è¯»å…¥æ—¶çš„è§„åˆ™
- *          v0.1.0  æ¨¡æ¿åŒ–CsvRowåŠCsvTableç±»
- *          v0.1.1  å»æ‰äº†BasicCsvRowåŠBasicCsvTableææ„å‡½æ•°ä¸­æ˜¾å¼è°ƒç”¨std::vector()::~vector()çš„éƒ¨åˆ†
- *          v0.1.2  æ’é™¤ç©ºè¡Œï¼›ä¿®æ”¹BasicCsvTableçš„CsvFormatåä¿®æ”¹æ‰€æœ‰å†…éƒ¨CsvRowçš„Formatå±æ€§ï¼›è¡¥é½æˆ–ä¿®å‰ª
- *                  åˆ—æ•°ä½¿ä¸è¡¨å¤´ç›¸ç­‰
- *          v0.2.0  å®Œæˆé‡å†™æ‰€æœ‰ä½¿å…ƒç´ å¢å‡çš„ä¿®æ”¹å™¨ï¼ˆinsertï¼Œemplaceï¼Œeraseï¼Œpush_backï¼Œemplace_backã€‚
- *          v0.2.1  é‡å†™éƒ¨åˆ†æ„é€ å‡½æ•°ã€‚
- *          v0.2.2  å¢åŠ è¡Œswap()å‡½æ•°ï¼Œå¢åŠ SwapRow()å‡½æ•°ã€‚
- *          v0.2.3  é‡å†™äº†assign()å‡½æ•°ã€‚é‡å†™äº†operator=()å‡½æ•°, é‡å†™copy ctorå’Œmove ctorã€‚
- *          v0.2.4  å¢åŠ NewRow()å‡½æ•°ã€‚
- *          v0.2.5  è§£å†³æ— æ³•è°ƒç”¨BasicCsvRow.operator[](size_t index)çš„é—®é¢˜ã€‚
- *          v0.2.6  ç®€åŒ–è¡¨æ ¼è¯»å…¥çš„ä»£ç ï¼Œä¿®å¤æŒ‡å®šåˆ—èŒƒå›´æ—¶ï¼Œè¯»å…¥æ®‹ä½™çš„é—®é¢˜ã€‚
- *          v0.3.0  å¢åŠ BasicCsvColumnç±»ï¼Œç”¨ä»¥è¡¨ç¤ºCSVè¡¨æ ¼ä¸­çš„è¡Œã€‚BAsicCsvTableå¢åŠ EraseColumn()å‡½æ•°ã€‚
- *          v0.3.1  Bugfix: è§£å†³è¡Œè¯»å–åå¯èƒ½æ•´è¡Œåˆ é™¤çš„é—®é¢˜ï¼›è§£å†³BasicCsvRow<CharT>::operator[]()å¯èƒ½è¿›å…¥é€’å½’çš„é—®é¢˜ã€‚
- *          v0.3.2  ä¿®æ”¹éƒ¨åˆ†ä»£ç ä»¥é€šè¿‡gccç¼–è¯‘æµ‹è¯•ã€‚
- *          v0.3.3  Bugfix: è¯»è¡Œæœ€åå­—ç¬¦ä¸º\"æ—¶ï¼ŒæŠ¥é”™ä¸­æ–­ã€‚ä¿®æ”¹BasicCsvRow<CharT>::operator[]ï¼Œæœªæ‰¾åˆ°å¯¹åº”headeræ—¶ï¼Œ
- *                  æŠ›å‡ºstd::invalid_argumentå¼‚å¸¸ã€‚
- *          v0.4.0  å¢åŠ æ¯”è¾ƒè¿ç®—ç¬¦ã€‚å¢åŠ æ’åºæ–¹æ³•BasicCsvTable::sort()ã€‚
- *          v0.4.1  ä¿®å¤ä¸€äº›é”™è¯¯ã€‚
+/*
+ *          v0.0.1  ÕıÊ½°æ
+ *          v0.0.2  ĞŞ¸ÄÁËFormat(CsvFomat _format)¶ÁÈëÊ±µÄ¹æÔò
+ *          v0.1.0  Ä£°å»¯CsvRow¼°CsvTableÀà
+ *          v0.1.1  È¥µôÁËBasicCsvRow¼°BasicCsvTableÎö¹¹º¯ÊıÖĞÏÔÊ½µ÷ÓÃstd::vector()::~vector()µÄ²¿·Ö
+ *          v0.1.2  ÅÅ³ı¿ÕĞĞ£»ĞŞ¸ÄBasicCsvTableµÄCsvFormatºóĞŞ¸ÄËùÓĞÄÚ²¿CsvRowµÄFormatÊôĞÔ£»²¹Æë»òĞŞ¼ô
+ *                  ÁĞÊıÊ¹Óë±íÍ·ÏàµÈ
+ *          v0.2.0  Íê³ÉÖØĞ´ËùÓĞÊ¹ÔªËØÔö¼õµÄĞŞ¸ÄÆ÷£¨insert£¬emplace£¬erase£¬push_back£¬emplace_back¡£
+ *          v0.2.1  ÖØĞ´²¿·Ö¹¹Ôìº¯Êı¡£
+ *          v0.2.2  Ôö¼ÓĞĞswap()º¯Êı£¬Ôö¼ÓSwapRow()º¯Êı¡£
+ *          v0.2.3  ÖØĞ´ÁËassign()º¯Êı¡£ÖØĞ´ÁËoperator=()º¯Êı, ÖØĞ´copy ctorºÍmove ctor¡£
+ *          v0.2.4  Ôö¼ÓNewRow()º¯Êı¡£
+ *          v0.2.5  ½â¾öÎŞ·¨µ÷ÓÃBasicCsvRow.operator[](size_t index)µÄÎÊÌâ¡£
+ *          v0.2.6  ¼ò»¯±í¸ñ¶ÁÈëµÄ´úÂë£¬ĞŞ¸´Ö¸¶¨ÁĞ·¶Î§Ê±£¬¶ÁÈë²ĞÓàµÄÎÊÌâ¡£
+ *          v0.3.0  Ôö¼ÓBasicCsvColumnÀà£¬ÓÃÒÔ±íÊ¾CSV±í¸ñÖĞµÄĞĞ¡£BAsicCsvTableÔö¼ÓEraseColumn()º¯Êı¡£
+ *          v0.3.1  Bugfix: ½â¾öĞĞ¶ÁÈ¡ºó¿ÉÄÜÕûĞĞÉ¾³ıµÄÎÊÌâ£»½â¾öBasicCsvRow<CharT>::operator[]()¿ÉÄÜ½øÈëµİ¹éµÄÎÊÌâ¡£
+ *          v0.3.2  ĞŞ¸Ä²¿·Ö´úÂëÒÔÍ¨¹ıgcc±àÒë²âÊÔ¡£
+ *          v0.3.3  Bugfix: ¶ÁĞĞ×îºó×Ö·ûÎª\"Ê±£¬±¨´íÖĞ¶Ï¡£ĞŞ¸ÄBasicCsvRow<CharT>::operator[]£¬Î´ÕÒµ½¶ÔÓ¦headerÊ±£¬
+ *                  Å×³östd::invalid_argumentÒì³£¡£
+ *          v0.4.0  Ôö¼Ó±È½ÏÔËËã·û¡£Ôö¼ÓÅÅĞò·½·¨BasicCsvTable::sort()¡£
+ *          v0.4.1  Bug fixed:ĞŞ¸´Ò»Ğ©´íÎó¡£
+ *          v0.4.2  Bug fixed:ĞŞ¸´Ò»Ğ©´íÎó¡£
  *
  */
