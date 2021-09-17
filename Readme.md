@@ -364,3 +364,5 @@ This project is licensed under the terms of the MIT license.
 | v0.4.0  | Comparision operator added. Sorting method `BasicCsvTable::sort()` addded.                                                                                                                                               |
 | v0.4.1  | Bugfix: Fixed some problem.                                                                                                                                                                                              |
 | v0.4.2  | Minor changes.                                                                                                                                                                                                           |
+| v0.4.3 | Bugfix: Fixed problems of `insert` function. |
+

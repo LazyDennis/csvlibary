@@ -202,7 +202,7 @@ namespace SimpleCSV
             const CsvSortList &SortList() noexcept { return SortList_; }
             void SortList(const CsvSortList &_sortlist) noexcept { SortList_ = _sortlist; }
 
-            bool operator()(const BasicCsvRow<CharT> _csvrowl, const BasicCsvRow<CharT> _csvrowr);
+            bool operator()(const BasicCsvRow<CharT> &_csvrowl, const BasicCsvRow<CharT> &_csvrowr);
         }; // class CsvRowComp
 
         void ModifyRow(
@@ -427,8 +427,8 @@ namespace SimpleCSV
     //SECTION: class BasicCsvTable method implementation
 
     template <class CharT>
-    bool BasicCsvTable<CharT>::CsvRowComp::operator()(const BasicCsvRow<CharT> _csvrowl,
-                                                      const BasicCsvRow<CharT> _csvrowr)
+    bool BasicCsvTable<CharT>::CsvRowComp::operator()(const BasicCsvRow<CharT> &_csvrowl,
+                                                      const BasicCsvRow<CharT> &_csvrowr)
     {
         if (_csvrowl.size() != _csvrowr.size() || SortList_.empty())
             return _csvrowl < _csvrowr;
@@ -1040,7 +1040,9 @@ namespace SimpleCSV
  *          v0.3.3  Bugfix: 读行最后字符为\"时，报错中断。修改BasicCsvRow<CharT>::operator[]，未找到对应header时，
  *                  抛出std::invalid_argument异常。
  *          v0.4.0  增加比较运算符。增加排序方法BasicCsvTable::sort()。
- *          v0.4.1  Bug fixed:修复一些错误。
- *          v0.4.2  Bug fixed:修复一些错误。
+ *          v0.4.1  Bug fixed: 修复一些错误。
+ *          v0.4.2  修改了部分代码。
+ *          v0.4.3  Bug fixed: 修复一些错误。
+ *          v0.4.4  Bug fixed: 修复一些错误。
  *
  */
