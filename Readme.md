@@ -375,5 +375,6 @@ This project is licensed under the terms of the MIT license.
 | v0.4.2  | Minor changes.                                                                                                                                                                                                           |
 | v0.4.3 | Bugfix: Fixed problems of `insert` function. |
 | v0.4.4 | Bugfix: Fixed problems. |
-| v0.5.0 | Function add: `find()`function is added.
+| v0.5.0 | Function add: `find()`function is added.|
+| v0.5.1 | Bugfix: Fixed problems of `find()` function of range settings. |
 

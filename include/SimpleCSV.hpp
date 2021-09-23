@@ -6,12 +6,13 @@
 
 #ifndef __SIMPLECSV_HPP
 #define __SIMPLECSV_HPP
+#define VERSION "V0.5.1"
 #include <string>
 #include <vector>
 #include <fstream>
- //#include <iostream>
 #include <algorithm>
 #include <utility>
+
 
 namespace SimpleCSV
 {
@@ -58,10 +59,10 @@ namespace SimpleCSV
 
     struct CsvRange
     {
-        IndexT Header_;       //读入文件的第Header_行为表头，-1时为无表头，默认0（第一行）,第Header_行前的数据会被丢弃
-        IndexT CountRows_;    //读入文件的行数，即读入文件的行范围[Header_, Header_ + CountRows_)的内容
-        IndexT Index_;        //文件的第Index_列为起始列
-        IndexT CountColumns_; //读入文件文件的列数
+        IndexT Header_;
+        IndexT CountRows_;
+        IndexT Index_;
+        IndexT CountColumns_;
 
         CsvRange(IndexT _header = 0,
             IndexT _CountRows = nIndex,
@@ -75,9 +76,9 @@ namespace SimpleCSV
     template <class CharT>
     struct CsvFormat
     {
-        std::basic_string<CharT> Delimeter_; //分隔符，默认 ","，支持多字符
-        CharT Quote_;                        //转义字符
-        CharT Endline_;                      //换行符
+        std::basic_string<CharT> Delimeter_;
+        CharT Quote_;
+        CharT Endline_;
 
         CsvFormat(std::basic_string<CharT> _delimeter = DFL_DELI<CharT>,
             CharT _quote = DFL_QUOTE<CharT>) : Delimeter_(_delimeter),
@@ -136,38 +137,47 @@ namespace SimpleCSV
 
         bool operator==(const BasicCsvRow<CharT> &_csvrow) noexcept
         {
-            return vector<std::basic_string<CharT>>(*this) == vector<std::basic_string<CharT>>(_csvrow);
+            return vector<std::basic_string<CharT>>(*this) ==
+                vector<std::basic_string<CharT>>(_csvrow);
         }
 
         bool operator!=(const BasicCsvRow<CharT> &_csvrow) noexcept
         {
-            return vector<std::basic_string<CharT>>(*this) != vector<std::basic_string<CharT>>(_csvrow);
+            return vector<std::basic_string<CharT>>(*this) !=
+                vector<std::basic_string<CharT>>(_csvrow);
         }
         bool operator<(const BasicCsvRow<CharT> &_csvrow) noexcept
         {
-            return vector<std::basic_string<CharT>>(*this) < vector<std::basic_string<CharT>>(_csvrow);
+            return vector<std::basic_string<CharT>>(*this) <
+                vector<std::basic_string<CharT>>(_csvrow);
         }
 
         bool operator>(const BasicCsvRow<CharT> &_csvrow) noexcept
         {
-            return vector<std::basic_string<CharT>>(*this) > vector<std::basic_string<CharT>>(_csvrow);
+            return vector<std::basic_string<CharT>>(*this) >
+                vector<std::basic_string<CharT>>(_csvrow);
         }
 
         bool operator<=(const BasicCsvRow<CharT> &_csvrow) noexcept
         {
-            return vector<std::basic_string<CharT>>(*this) <= vector<std::basic_string<CharT>>(_csvrow);
+            return vector<std::basic_string<CharT>>(*this) <=
+                vector<std::basic_string<CharT>>(_csvrow);
         }
 
         bool operator>=(const BasicCsvRow<CharT> &_csvrow) noexcept
         {
-            return vector<std::basic_string<CharT>>(*this) >= vector<std::basic_string<CharT>>(_csvrow);
+            return vector<std::basic_string<CharT>>(*this) >=
+                vector<std::basic_string<CharT>>(_csvrow);
         }
-        bool find(const std::basic_string<CharT> &_TargetStr, vector<IndexT> &_FindResult, const CsvRange &_Range = CsvRange())
+        bool find(const std::basic_string<CharT> &_TargetStr,
+            vector<IndexT> &_FindResult,
+            const CsvRange &_Range = CsvRange())
         {
             IndexT FindColumn;
             Range_ = _Range;
             for (auto itpos = this->begin() + Range_.Index_;
-                itpos < ((this->size() < Range_.CountColumns_) ? this->end() : this->begin() + Range_.CountColumns_);
+                itpos < ((this->size() < Range_.Index_ + Range_.CountColumns_) ?
+                    this->end() : this->begin() + Range_.Index_ + Range_.CountColumns_);
                 ++itpos)
             {
                 FindColumn = itpos->find(_TargetStr);
@@ -194,7 +204,7 @@ namespace SimpleCSV
     private:
         CsvRange Range_;
         CsvFormat<CharT> Format_;
-        IndexT Columns_ = 0; //Header_的列数
+        IndexT Columns_ = 0;
 
         friend BasicCsvRow<CharT>;
 
@@ -215,9 +225,13 @@ namespace SimpleCSV
             CsvRowComp &operator=(CsvRowComp &&_CsvRowComp) = default;
 
             const CsvSortList &SortList() noexcept { return SortList_; }
-            void SortList(const CsvSortList &_sortlist) noexcept { SortList_ = _sortlist; }
+            void SortList(const CsvSortList &_sortlist) noexcept
+            {
+                SortList_ = _sortlist;
+            }
 
-            bool operator()(const BasicCsvRow<CharT> &_csvrowl, const BasicCsvRow<CharT> &_csvrowr);
+            bool operator()(const BasicCsvRow<CharT> &_csvrowl,
+                const BasicCsvRow<CharT> &_csvrowr);
         }; // class CsvRowComp
 
         void ModifyRow(
@@ -254,13 +268,18 @@ namespace SimpleCSV
             ModifyRow(this->begin(), this->cbegin(), 0);
         }
         BasicCsvTable(std::initializer_list<BasicCsvRow<CharT>> _CsvRowList) noexcept
-            : vector<BasicCsvRow<CharT>>(_CsvRowList) { ModifyRow(this->begin(), this->cbegin(), 0); };
-        BasicCsvTable(const BasicCsvTable<CharT> &_CsvTable) : vector<BasicCsvRow<CharT>>(_CsvTable)
+            : vector<BasicCsvRow<CharT>>(_CsvRowList)
+        {
+            ModifyRow(this->begin(), this->cbegin(), 0);
+        };
+        BasicCsvTable(const BasicCsvTable<CharT> &_CsvTable) :
+            vector<BasicCsvRow<CharT>>(_CsvTable)
         {
             Format_ = _CsvTable.Format_;
             Columns_ = _CsvTable.Columns_;
         }
-        BasicCsvTable(BasicCsvTable &&_CsvTable) noexcept : vector<BasicCsvRow<CharT>>(_CsvTable)
+        BasicCsvTable(BasicCsvTable &&_CsvTable) noexcept :
+            vector<BasicCsvRow<CharT>>(_CsvTable)
         {
             Format_ = std::move(_CsvTable.Format_);
             Columns_ = _CsvTable.Columns_;
@@ -277,12 +296,12 @@ namespace SimpleCSV
         const CsvRange &Range() const noexcept { return Range_; }
         const CsvFormat<CharT> &Format() const noexcept { return Format_; }
 
-        BasicCsvColumn<CharT> Column(IndexT _Index) const noexcept;                  //返回指定列整列数据
-        IndexT HeadIndex(const std::basic_string<CharT> &_fieldname) const noexcept; //返回指定字符串在表头中的位置，如果没有表头，或没有找到字符串，返回nIndex;
+        BasicCsvColumn<CharT> Column(IndexT _Index) const noexcept;
+        IndexT HeadIndex(const std::basic_string<CharT> &_fieldname) const noexcept;
 
-        IndexT Rows() const noexcept { return this->size(); }  //返回行数
-        IndexT Columns() const noexcept { return Columns_; }   //返回列数
-        void Columns(IndexT _Columns) { Columns_ = _Columns; } //设置列数
+        IndexT Rows() const noexcept { return this->size(); }
+        IndexT Columns() const noexcept { return Columns_; }
+        void Columns(IndexT _Columns) { Columns_ = _Columns; }
         typename BasicCsvTable<CharT>::iterator NewRow();
 
         const BasicCsvTable<CharT> &operator=(std::initializer_list<BasicCsvRow<CharT>> _CsvRowList);
@@ -396,12 +415,14 @@ namespace SimpleCSV
                 std::sort(this->begin(), this->end(), CsvRowComp(_SortList));
         }
 
-        bool find(const std::basic_string<CharT> _TargetStr, CsvTablePos &_TablePos, const CsvRange &_Range = CsvRange())
+        bool find(const std::basic_string<CharT> _TargetStr,
+            CsvTablePos &_TablePos, const CsvRange &_Range = CsvRange())
         {
             vector<IndexT> FindColumn;
             Range_ = _Range;
-            for (auto itpos = this->begin() + Range_.Header_; 
-                itpos < ((this->size() < Range_.CountRows_) ? this->end() : this->begin() + Range_.CountRows_);
+            for (auto itpos = this->begin() + Range_.Header_;
+                itpos < ((this->size() < Range_.Header_ + Range_.CountRows_) ?
+                    this->end() : this->begin() + Range_.Header_ + Range_.CountRows_);
                 ++itpos)
             {
                 if (itpos->find(_TargetStr, FindColumn, Range_))
@@ -914,32 +935,33 @@ namespace SimpleCSV
         {
             getline(is, StrSource);
             if (EndlineFlag)
-                StrSource = StrTmp + StrSource; //如果内容包含换行，则添加上换行前的内容
+                StrSource = StrTmp + StrSource;
             it1 = it2 = StrSource.begin();
-            while (it1 != StrSource.end()) //对读入行进行处理
+            while (it1 != StrSource.end())
             {
                 if (*it1 == _CsvRow.Format().Quote_)
                 {
                     ++it1;
                     if (EndlineFlag)
                     {
-                        it2 += StrTmp.size(); //直接从换行后的内容开始，
-                        EndlineFlag = false;  //对换行内容处理完毕
+                        it2 += StrTmp.size();
+                        EndlineFlag = false;
                     }
                     else
                         it2 = it1;
                     while (!(*it2 == _CsvRow.Format().Quote_ &&
                         (it2 >= StrSource.end() - 1 ||
-                            IsDeli(it2 + 1, _CsvRow.Format().Delimeter_)))) // 当前字节为quote_char且下一部分为Delimeter_或字符结束，说明字符已结束
+                            IsDeli(it2 + 1, _CsvRow.Format().Delimeter_))))
                     {
-                        if (*it2 == _CsvRow.Format().Quote_ && *(it2 + 1) == _CsvRow.Format().Quote_)
+                        if (*it2 == _CsvRow.Format().Quote_ &&
+                            *(it2 + 1) == _CsvRow.Format().Quote_)
                             StrSource.erase(it2);
-                        if (it2 >= StrSource.end() - 1) // 内容中存在换行
+                        if (it2 >= StrSource.end() - 1)
                         {
                             StrTmp = _CsvRow.Format().Quote_ +
                                 std::basic_string<CharT>(it1, it2 + 1) +
-                                _CsvRow.Format().Endline_; //已处理的内容临时存放于于StrTmp中
-                            EndlineFlag = true;                 //设置换行标记
+                                _CsvRow.Format().Endline_;
+                            EndlineFlag = true;
                             break;
                         }
                         ++it2;
@@ -948,7 +970,8 @@ namespace SimpleCSV
                 else
                 {
                     it2 = it1;
-                    auto en = StrSource.find(_CsvRow.Format().Delimeter_, it1 - StrSource.begin());
+                    auto en = StrSource.find(
+                        _CsvRow.Format().Delimeter_, it1 - StrSource.begin());
                     if (~en)
                         it2 = StrSource.begin() + en;
                     else
@@ -1032,7 +1055,8 @@ namespace SimpleCSV
 
             if (!CsvRow_tmp.empty())
             {
-                if (_CsvTable.Range().Header_ == nIndex || loadedline++ >= _CsvTable.Range().Header_) //如果Header_ == nIndex，为没有Header_的情况，每一行都被读入；如果loadedline >= Header_，可以读入余下的行
+                if (_CsvTable.Range().Header_ == nIndex ||
+                    loadedline++ >= _CsvTable.Range().Header_)
                 {
                     _CsvTable.emplace_back(std::move(CsvRow_tmp));
                 }
@@ -1056,30 +1080,3 @@ namespace SimpleCSV
 } //namespace SimpleCSV
 
 #endif //__SIMPLECSV_HPP
-       /*
- *          v0.0.1  正式版
- *          v0.0.2  修改了Format(CsvFomat _format)读入时的规则
- *          v0.1.0  模板化CsvRow及CsvTable类
- *          v0.1.1  去掉了BasicCsvRow及BasicCsvTable析构函数中显式调用std::vector()::~vector()的部分
- *          v0.1.2  排除空行；修改BasicCsvTable的CsvFormat后修改所有内部CsvRow的Format属性；补齐或修剪
- *                  列数使与表头相等
- *          v0.2.0  完成重写所有使元素增减的修改器（insert，emplace，erase，push_back，emplace_back。
- *          v0.2.1  重写部分构造函数。
- *          v0.2.2  增加行swap()函数，增加SwapRow()函数。
- *          v0.2.3  重写了assign()函数。重写了operator=()函数, 重写copy ctor和move ctor。
- *          v0.2.4  增加NewRow()函数。
- *          v0.2.5  解决无法调用BasicCsvRow.operator[](size_t index)的问题。
- *          v0.2.6  简化表格读入的代码，修复指定列范围时，读入残余的问题。
- *          v0.3.0  增加BasicCsvColumn类，用以表示CSV表格中的行。BAsicCsvTable增加EraseColumn()函数。
- *          v0.3.1  Bugfix: 解决行读取后可能整行删除的问题；解决BasicCsvRow<CharT>::operator[]()可能进入递归的问题。
- *          v0.3.2  修改部分代码以通过gcc编译测试。                                                                                          B
- *          v0.3.3  Bugfix: 读行最后字符为\"时，报错中断。修改BasicCsvRow<CharT>::operator[]，未找到对应header时，
- *                  抛出std::invalid_argument异常。
- *          v0.4.0  增加比较运算符。增加排序方法BasicCsvTable::sort()。
- *          v0.4.1  Bug fixed: 修复一些错误。
- *          v0.4.2  修改了部分代码。
- *          v0.4.3  Bug fixed: 修复一些错误。
- *          v0.4.4  Bug fixed: 修复一些错误。
- *          v0.5.0  Function added: 增加查找功能。
- *
- */
