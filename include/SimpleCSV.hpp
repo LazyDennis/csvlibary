@@ -171,7 +171,7 @@ namespace SimpleCSV
         }
         bool find(const std::basic_string<CharT> &_TargetStr,
             vector<IndexT> &_FindResult,
-            const CsvRange &_Range = CsvRange()) const
+            const CsvRange &_Range = Range_) const
         {
             IndexT FindColumn;
             for (auto itpos = this->begin() + _Range.Index_;
@@ -185,7 +185,7 @@ namespace SimpleCSV
             }
             return _FindResult.size();
         }
-        bool find(const std::basic_string<CharT> &_TargetStr, const CsvRange &_Range = CsvRange()) const
+        bool find(const std::basic_string<CharT> &_TargetStr, const CsvRange &_Range = Range_) const
         {
             for (auto itpos = this->begin() + _Range.Index_;
                 itpos < ((this->size() < _Range.Index_ + _Range.CountColumns_) ?
@@ -429,7 +429,7 @@ namespace SimpleCSV
         }
 
         bool find(const std::basic_string<CharT> _TargetStr,
-            CsvTablePos &_TablePos, const CsvRange &_Range = CsvRange()) const
+            CsvTablePos &_TablePos, const CsvRange &_Range = Range_) const
         {
             vector<IndexT> FindColumn;
             for (auto itpos = this->begin() + _Range.Header_;
@@ -448,7 +448,7 @@ namespace SimpleCSV
         }
 
         bool find(const std::basic_string<CharT> _TargetStr,
-            const CsvRange &_Range = CsvRange()) const
+            const CsvRange &_Range = Range_) const
         {
             for (auto itpos = this->begin() + _Range.Header_;
                 itpos < ((this->size() < _Range.Header_ + _Range.CountRows_) ?
