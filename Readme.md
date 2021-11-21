@@ -194,6 +194,7 @@ Public methods are as below
 | `template <class CharT> std::basic_string<CharT> &operator[](const std::basic_string<CharT> &_FieldName)`<p></p>`template <class CharT> const std::basic_string<CharT> &operator[](const std::basic_string<CharT> &_FieldName) const`                                                                                                                                                                           | Use a header string to find a specified elements of a row. A `std::invalid_argument` excpetion will be throwed if the string is not found. |
 | `bool operator==(const BasicCsvRow<CharT> &_csvrow) noexcept`<p></p>`bool operator!=(const BasicCsvRow<CharT> &_csvrow) noexcept`<p></p>`bool operator<(const BasicCsvRow<CharT> &_csvrow) noexcept`<p></p>`bool operator<=(const BasicCsvRow<CharT> &_csvrow) noexcept`<p></p>`bool operator>(const BasicCsvRow<CharT> &_csvrow) noexcept`<p></p>`bool operator>=(const BasicCsvRow<CharT> &_csvrow) noexcept` | Used to compare rows. `SortList` is not available for these methods.                                                                       |
 | `bool find(const std::basic_string<CharT> &_TargetStr, vector<IndexT> &_FindResult, const CsvRange &_Range = CsvRange())` | Used to find a specified string in the row. All found position will be recorded in `_FindResult`. Searching area can be setup by inputting a `CsvRange` variable. |
+| `bool find(const std::basic_string<CharT> &_TargetStr, const CsvRange &_Range = CsvRange())` | Used to find a specified string in the row. Only return the result that whether the target string is existed or not. Searching area can be setup by inputting a `CsvRange` variable. |
 
 #### 2. Non member methods
 
@@ -224,7 +225,9 @@ Public methods are as below
 | `typename BasicCsvRow<CharT>::iterator EraseColumn(typename BasicCsvRow<CharT>::iterator _FirstPosition, typename BasicCsvRow<CharT>::iterator _LastPosition)`<p></p>`typename BasicCsvRow<CharT>::iterator EraseColumn(IndexT _FirstPosition, IndexT _LastPosition)`                                                                                                                                                                   | Erase the columns in range `[_FromPosition, _LastPosition)`.                                                                                   |
 | `bool operator==(const BasicCsvTable<CharT> &_csvtable) noexcept`<p></p>`bool operator!=(const BasicCsvTable<CharT> &_csvtable) noexcept`<p></p>`bool operator<(const BasicCsvTable<CharT> &_csvtable) noexcept`<p></p>`bool operator<=(const BasicCsvTable<CharT> &_csvtable) noexcept`<p></p>`bool operator>(const BasicCsvTable<CharT> &_csvtable) noexcept`<p></p>`bool operator>=(const BasicCsvTable<CharT> &_csvtable) noexcept` | Used to compare tables.                                                                                                                        |
 | `void sort()` <p></p> `void sort(const CsvSortList &_SortList)`                                                                                                                                                                                                                                                                                                                                                                         | Sort all the rows except header(if header exists).                                                                                             |
-| `bool find(const std::basic_string<CharT> &_TargetStr, CsvTablePos &_TablePos, const CsvRange &_Range = CsvRange())` | Used to find a specified string in the row. All found position will be recorded in `_TablePos`. Searching area can be setup by inputting a `CsvRange` variable. |
+| `bool find(const std::basic_string<CharT> &_TargetStr, CsvTablePos &_TablePos, const CsvRange &_Range = CsvRange())` | Used to find a specified string in the table. All found position will be recorded in `_TablePos`. Searching area can be setup by inputting a `CsvRange` variable. |
+|`bool find(const std::basic_string<CharT> &_TargetStr, const CsvRange &_Range = CsvRange())`| Used to find a specified string in the table. Only return the result that whether the target string is existed or not. Searching area can be setup by inputting a `CsvRange` variable.|
+
 
 #### 2. Non member methods
 
@@ -377,4 +380,5 @@ This project is licensed under the terms of the MIT license.
 | v0.4.4 | Bugfix: Fixed problems. |
 | v0.5.0 | Function add: `find()`function is added.|
 | v0.5.1 | Bugfix: Fixed problems of `find()` function of range settings. |
+|  v0.6.0 | Function add: `find()` (only return existed or not result) function is added. <p></p>Bugfix: Fixed problems of `sort()`. |
 

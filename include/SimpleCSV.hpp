@@ -6,7 +6,7 @@
 
 #ifndef __SIMPLECSV_HPP
 #define __SIMPLECSV_HPP
-#define VERSION "V0.5.1"
+#define VERSION "V0.6.0"
 #include <string>
 #include <vector>
 #include <fstream>
@@ -171,13 +171,12 @@ namespace SimpleCSV
         }
         bool find(const std::basic_string<CharT> &_TargetStr,
             vector<IndexT> &_FindResult,
-            const CsvRange &_Range = CsvRange())
+            const CsvRange &_Range = CsvRange()) const
         {
             IndexT FindColumn;
-            Range_ = _Range;
-            for (auto itpos = this->begin() + Range_.Index_;
-                itpos < ((this->size() < Range_.Index_ + Range_.CountColumns_) ?
-                    this->end() : this->begin() + Range_.Index_ + Range_.CountColumns_);
+            for (auto itpos = this->begin() + _Range.Index_;
+                itpos < ((this->size() < _Range.Index_ + _Range.CountColumns_) ?
+                    this->end() : this->begin() + _Range.Index_ + _Range.CountColumns_);
                 ++itpos)
             {
                 FindColumn = itpos->find(_TargetStr);
@@ -185,6 +184,18 @@ namespace SimpleCSV
                     _FindResult.push_back(itpos - this->begin());
             }
             return _FindResult.size();
+        }
+        bool find(const std::basic_string<CharT> &_TargetStr, const CsvRange &_Range = CsvRange()) const
+        {
+            for (auto itpos = this->begin() + _Range.Index_;
+                itpos < ((this->size() < _Range.Index_ + _Range.CountColumns_) ?
+                    this->end() : this->begin() + _Range.Index_ + _Range.CountColumns_);
+                ++itpos)
+            {
+                if (~itpos->find(_TargetStr))
+                    return true;
+            }
+            return false;
         }
     }; //class BasicCsvRow
 
@@ -406,23 +417,24 @@ namespace SimpleCSV
                 std::sort(this->begin() + 1, this->end());
             else
                 std::sort(this->begin(), this->end());
+            ModifyRow(this->begin(), this->begin(), this->size());
         }
         void sort(const CsvSortList &_SortList)
         {
-            if (~Range_.Header_)
+            if (~_Range.Header_)
                 std::sort(this->begin() + 1, this->end(), CsvRowComp(_SortList));
             else
                 std::sort(this->begin(), this->end(), CsvRowComp(_SortList));
+            ModifyRow(this->begin(), this->begin(), this->size());
         }
 
         bool find(const std::basic_string<CharT> _TargetStr,
-            CsvTablePos &_TablePos, const CsvRange &_Range = CsvRange())
+            CsvTablePos &_TablePos, const CsvRange &_Range = CsvRange()) const
         {
             vector<IndexT> FindColumn;
-            Range_ = _Range;
-            for (auto itpos = this->begin() + Range_.Header_;
-                itpos < ((this->size() < Range_.Header_ + Range_.CountRows_) ?
-                    this->end() : this->begin() + Range_.Header_ + Range_.CountRows_);
+            for (auto itpos = this->begin() + _Range.Header_;
+                itpos < ((this->size() < _Range.Header_ + _Range.CountRows_) ?
+                    this->end() : this->begin() + _Range.Header_ + _Range.CountRows_);
                 ++itpos)
             {
                 if (itpos->find(_TargetStr, FindColumn, Range_))
@@ -433,6 +445,20 @@ namespace SimpleCSV
                 FindColumn.clear();
             }
             return _TablePos.size();
+        }
+
+        bool find(const std::basic_string<CharT> _TargetStr,
+            const CsvRange &_Range = CsvRange()) const
+        {
+            for (auto itpos = this->begin() + _Range.Header_;
+                itpos < ((this->size() < _Range.Header_ + _Range.CountRows_) ?
+                    this->end() : this->begin() + _Range.Header_ + _Range.CountRows_);
+                ++itpos)
+            {
+                if (itpos->find(_TargetStr, Range_))
+                    return true;
+            }
+            return false;
         }
     }; //class BasicCsvTable
 
