@@ -6,7 +6,7 @@
 
 #ifndef __SIMPLECSV_HPP
 #define __SIMPLECSV_HPP
-#define CSVVERSION "V0.6.1"
+#define CSVVERSION "V0.6.2"
 #include <string>
 #include <vector>
 #include <fstream>
@@ -189,7 +189,7 @@ namespace SimpleCSV
         {
             return find(_TargetStr, _FindResult, Range_);
         }
-        bool find(const std::basic_string<CharT> &_TargetStr, const CsvRange &_Range) const
+        IndexT find(const std::basic_string<CharT> &_TargetStr, const CsvRange &_Range) const
         {
             for (auto itpos = this->begin() + _Range.Index_;
                 itpos < ((this->size() < _Range.Index_ + _Range.CountColumns_) ?
@@ -197,12 +197,12 @@ namespace SimpleCSV
                 ++itpos)
             {
                 if (~itpos->find(_TargetStr))
-                    return true;
+                    return itpos - this->begin();
             }
-            return false;
+            return nIndex;
         }
 
-        bool find(const std::basic_string<CharT> &_TargetStr) const
+        IndexT find(const std::basic_string<CharT> &_TargetStr) const
         {
             return find(_TargetStr, Range_);
         }
@@ -459,7 +459,7 @@ namespace SimpleCSV
         {
             return find(_TargetStr, _TablePos, Range_);
         }
-        bool find(const std::basic_string<CharT> _TargetStr,
+        IndexT find(const std::basic_string<CharT> _TargetStr,
             const CsvRange &_Range) const
         {
             for (auto itpos = this->begin() + _Range.Header_;
@@ -467,13 +467,13 @@ namespace SimpleCSV
                     this->end() : this->begin() + _Range.Header_ + _Range.CountRows_);
                 ++itpos)
             {
-                if (itpos->find(_TargetStr, _Range))
-                    return true;
+                if (~itpos->find(_TargetStr, _Range))
+                    return itpos - this->begin();
             }
-            return false;
+            return nIndex;
         }
 
-        bool find(const std::basic_string<CharT> _TargetStr) const
+        IndexT find(const std::basic_string<CharT> _TargetStr) const
         {
             return find(_TargetStr, Range_);
         }

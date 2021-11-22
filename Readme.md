@@ -194,7 +194,7 @@ Public methods are as below
 | `template <class CharT> std::basic_string<CharT> &operator[](const std::basic_string<CharT> &_FieldName)`<p></p>`template <class CharT> const std::basic_string<CharT> &operator[](const std::basic_string<CharT> &_FieldName) const` | Use a header string to find a specified elements of a row. A `std::invalid_argument` excpetion will be throwed if the string is not found. |
 | `bool operator==(const BasicCsvRow<CharT> &_csvrow) noexcept`<p></p>`bool operator!=(const BasicCsvRow<CharT> &_csvrow) noexcept`<p></p>`bool operator<(const BasicCsvRow<CharT> &_csvrow) noexcept`<p></p>`bool operator<=(const BasicCsvRow<CharT> &_csvrow) noexcept`<p></p>`bool operator>(const BasicCsvRow<CharT> &_csvrow) noexcept`<p></p>`bool operator>=(const BasicCsvRow<CharT> &_csvrow) noexcept` | Used to compare rows. `SortList` is not available for these methods. |
 | `bool find(const std::basic_string<CharT> &_TargetStr, vector<IndexT> &_FindResult, const CsvRange &_Range)`<p></p>`bool find(const std::basic_string<CharT> &_TargetStr, vector<IndexT> &_FindResult)` | Used to find a specified string in the row. All found position will be recorded in `_FindResult`. Searching area can be setup by inputting a `CsvRange` variable, range setting of specialized object would be used as default. |
-| `bool find(const std::basic_string<CharT> &_TargetStr, const CsvRange &_Range)`<p></p>`bool find(const std::basic_string<CharT> &_TargetStr)` | Used to find a specified string in the row. Only return the result that whether the target string is existed or not. Searching area can be setup by inputting a `CsvRange` variable, range setting of specialized object would be used as default. |
+| `bool find(const std::basic_string<CharT> &_TargetStr, const CsvRange &_Range)`<p></p>`bool find(const std::basic_string<CharT> &_TargetStr)` | Used to find a specified string in the row. Return the position at which the string is found.`nIndex` would be return if not found. Searching area can be setup by inputting a `CsvRange` variable, range setting of specialized object would be used as default. |
 
 #### 2. Non member methods
 
@@ -226,7 +226,7 @@ Public methods are as below
 | `bool operator==(const BasicCsvTable<CharT> &_csvtable) noexcept`<p></p>`bool operator!=(const BasicCsvTable<CharT> &_csvtable) noexcept`<p></p>`bool operator<(const BasicCsvTable<CharT> &_csvtable) noexcept`<p></p>`bool operator<=(const BasicCsvTable<CharT> &_csvtable) noexcept`<p></p>`bool operator>(const BasicCsvTable<CharT> &_csvtable) noexcept`<p></p>`bool operator>=(const BasicCsvTable<CharT> &_csvtable) noexcept` | Used to compare tables.                                      |
 | `void sort()` <p></p> `void sort(const CsvSortList &_SortList)` | Sort all the rows except header(if header exists).           |
 | `bool find(const std::basic_string<CharT> &_TargetStr, CsvTablePos &_TablePos, const CsvRange &_Range)`<p></p>`bool find(const std::basic_string<CharT> &_TargetStr, CsvTablePos &_TablePos)` | Used to find a specified string in the table. All found position will be recorded in `_TablePos`. Searching area can be setup by inputting a `CsvRange` variable, range setting of specialized object would be used as default. |
-| `bool find(const std::basic_string<CharT> &_TargetStr, const CsvRange &_Range)`<p></p>`bool find(const std::basic_string<CharT> &_TargetStr, const CsvRange &_Range)` | Used to find a specified string in the table. Only return the result that whether the target string is existed or not. Searching area can be setup by inputting a `CsvRange` variable, range setting of specialized object would be used as default. |
+| `IndexT find(const std::basic_string<CharT> &_TargetStr, const CsvRange &_Range)`<p></p>`IndexT find(const std::basic_string<CharT> &_TargetStr)` | Used to find a specified string in the table. Return the first row in which the string is found. `nIndex` would be return if not found. Searching area can be setup by inputting a `CsvRange` variable, range setting of specialized object would be used as default. |
 
 
 #### 2. Non member methods
@@ -382,3 +382,4 @@ This project is licensed under the terms of the MIT license.
 | v0.5.1 | Bugfix: Fixed problems of `find()` function of range settings. |
 |  v0.6.0 | Function add: `find()` (only return existed or not result) function is added. <p></p>Bugfix: Fixed problems of `sort()`. |
 | v0.6.1 | Bugfix: Fixed problems of `find()` function. |
+| v0.6.2 | Function modified: `find()`, returns the first position at which the target string found |
