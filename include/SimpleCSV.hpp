@@ -6,7 +6,7 @@
 
 #ifndef __SIMPLECSV_HPP
 #define __SIMPLECSV_HPP
-#define CSVVERSION "V0.6.2"
+#define CSVVERSION "V0.6.3"
 #include <string>
 #include <vector>
 #include <fstream>
@@ -420,20 +420,17 @@ namespace SimpleCSV
         typename BasicCsvRow<CharT>::iterator EraseColumn(
             IndexT _FirstPosition, IndexT _LastPosition);
 
-        void sort()
+        /*void sort()
         {
             if (~Range_.Header_)
                 std::sort(this->begin() + 1, this->end());
             else
                 std::sort(this->begin(), this->end());
             ModifyRow(this->begin(), this->begin(), this->size());
-        }
-        void sort(const CsvSortList &_SortList)
+        }*/
+        void sort(const CsvSortList &_SortList = CsvSortList())
         {
-            if (~Range_.Header_)
-                std::sort(this->begin() + 1, this->end(), CsvRowComp(_SortList));
-            else
-                std::sort(this->begin(), this->end(), CsvRowComp(_SortList));
+            std::sort(this->begin() + Range_.Header_, this->end(), CsvRowComp(_SortList));
             ModifyRow(this->begin(), this->begin(), this->size());
         }
 

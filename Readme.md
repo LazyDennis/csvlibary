@@ -33,7 +33,7 @@ This is a CSV(Comma-Separated Values) libary for simple use of reading / writing
 - [Update Log](#update-log)
 
 This is a CSV libary written by `C++`. It can be used to read or write CSV files. By inheriting `std::vector` class of `C++` standard libary, there are two main classes in the libary, included in namespace `SimpleCSV`. I am going show how to use the libary below.
-Delimeter and escape character can be customized, and `','` as delimeter , `'\"'` as escape character and `'\n'` as newline, are set as default. Multiple characters of delimeter is supported in this libary.
+Delimiter and escape character can be customized, and `','` as delimiter , `'\"'` as escape character and `'\n'` as newline, are set as default. Multiple characters of delimiter is supported in this library.
 
 ---
 
@@ -170,15 +170,15 @@ Public methods are as below
 
 ### struct CsvRange
 
-| Method                                                                                                        | Usage                                                   |
-| :------------------------------------------------------------------------------------------------------------ | :------------------------------------------------------ |
-| `CsvRange(IndexT _header = 0, IndexT _CountRows = nIndex, IndexT _index = 0, IndexT _CountColumns = nIndex);` | Default constructor to construct a variable of CsvRange |
+| Method                                                       | Usage                                                     |
+| :----------------------------------------------------------- | :-------------------------------------------------------- |
+| `CsvRange(IndexT _header = 0, IndexT _CountRows = nIndex, IndexT _index = 0, IndexT _CountColumns = nIndex);` | Default constructor to construct a variable of `CsvRange` |
 
 ### struct Format
 
-| Method                                                            | Usage                                                     |
-| :---------------------------------------------------------------- | :-------------------------------------------------------- |
-| `CsvFormat(StrT _delimeter = DFL_DELI, char _quote = DFL_QUOTE);` | Default constructor to construct a variable of CsvFormmat |
+| Method                                                       | Usage                                                       |
+| :----------------------------------------------------------- | :---------------------------------------------------------- |
+| `CsvFormat(StrT _delimeter = DFL_DELI, char _quote = DFL_QUOTE);` | Default constructor to construct a variable of `CsvFormmat` |
 
 ### class CsvRow
 
@@ -186,11 +186,11 @@ Public methods are as below
 
 | Method                                                       | Usage                                                        |
 | :----------------------------------------------------------- | :----------------------------------------------------------- |
-| `CsvRow()`                                                   | Default constructor to construct a variable of CsvRow        |
-| `CsvRow(const CsvRange &_range, const CsvFormat &_format) noexcept` | Customized range and format can be set by using this constructor to initialize a CsvRow Variable. |
+| `CsvRow()`                                                   | Default constructor to construct a variable of `CsvRow`      |
+| `CsvRow(const CsvRange &_range, const CsvFormat &_format) noexcept` | Customized range and format can be set by using this constructor to initialize a `CsvRow` Variable. |
 | `void Range(const CsvRange &_range) noexcept`<p></p>`const CsvRange &Range() const noexcept` | Use `.Range(range)` to set range property or use `.Range()` to get current range property. |
 | `template <class CharT> void Format<CharT>(const CsvFormat &_format) noexcept`<p></p>`template <class CharT> const CsvFormat<CharT> &Format() const noexcept` | Use `.Format(format)` to set format property or use `.Format()` to get current format property. |
-| `void Row(IndexT _row) noexcept` <p></p>`IndexT Row() const noexcept` | Use `.Row(row)` to set a row number for a BasicCsvRow object, or use `.Row()` to get current row number. |
+| `void Row(IndexT _row) noexcept` <p></p>`IndexT Row() const noexcept` | Use `.Row(row)` to set a row number for a `BasicCsvRow` object, or use `.Row()` to get current row number. |
 | `template <class CharT> std::basic_string<CharT> &operator[](const std::basic_string<CharT> &_FieldName)`<p></p>`template <class CharT> const std::basic_string<CharT> &operator[](const std::basic_string<CharT> &_FieldName) const` | Use a header string to find a specified elements of a row. A `std::invalid_argument` excpetion will be throwed if the string is not found. |
 | `bool operator==(const BasicCsvRow<CharT> &_csvrow) noexcept`<p></p>`bool operator!=(const BasicCsvRow<CharT> &_csvrow) noexcept`<p></p>`bool operator<(const BasicCsvRow<CharT> &_csvrow) noexcept`<p></p>`bool operator<=(const BasicCsvRow<CharT> &_csvrow) noexcept`<p></p>`bool operator>(const BasicCsvRow<CharT> &_csvrow) noexcept`<p></p>`bool operator>=(const BasicCsvRow<CharT> &_csvrow) noexcept` | Used to compare rows. `SortList` is not available for these methods. |
 | `bool find(const std::basic_string<CharT> &_TargetStr, vector<IndexT> &_FindResult, const CsvRange &_Range)`<p></p>`bool find(const std::basic_string<CharT> &_TargetStr, vector<IndexT> &_FindResult)` | Used to find a specified string in the row. All found position will be recorded in `_FindResult`. Searching area can be setup by inputting a `CsvRange` variable, range setting of specialized object would be used as default. |
@@ -209,8 +209,8 @@ Public methods are as below
 
 | Method                                                       | Usage                                                        |
 | :----------------------------------------------------------- | :----------------------------------------------------------- |
-| `CsvTable()`                                                 | Default constructor to construct a variable of CsvTable      |
-| `CsvTable(const CsvRange &_range, const CsvFormat &_format) noexcept` | Customized range and format can be set by using this constructor to initialize a CsvTable Variable. |
+| `CsvTable()`                                                 | Default constructor to construct a variable of `CsvTable`    |
+| `CsvTable(const CsvRange &_range, const CsvFormat &_format) noexcept` | Customized range and format can be set by using this constructor to initialize a `CsvTable` Variable. |
 | ` explicit BasicCsvTable(IndexT _Row, IndexT _Columns = 0) noexcept` | Make a empty table of specified rows and columns.            |
 | `void Range(const CsvRange &_range) noexcept`<p></p>`const CsvRange &Range() const noexcept` | Use `.Range(range)` to set range property or use `.Range()` to get current range property. |
 | `template <class CharT> void Format<CharT>(const CsvFormat &_format) noexcept`<p></p>`template <class CharT> const CsvFormat<CharT> &Format<CharT>() const noexcept` | Use `.Format(format)` to set format property or use `.Format()` to get current format property. |
@@ -224,7 +224,7 @@ Public methods are as below
 | `typename BasicCsvRow<CharT>::iterator EraseColumn(typename BasicCsvRow<CharT>::iterator _ErasePosition)`<p></p>`typename BasicCsvRow<CharT>::iterator EraseColumn(IndexT _ErasePosition)` | Erase a column which iterator `ErasePosition` is pointing at header. |
 | `typename BasicCsvRow<CharT>::iterator EraseColumn(typename BasicCsvRow<CharT>::iterator _FirstPosition, typename BasicCsvRow<CharT>::iterator _LastPosition)`<p></p>`typename BasicCsvRow<CharT>::iterator EraseColumn(IndexT _FirstPosition, IndexT _LastPosition)` | Erase the columns in range `[_FromPosition, _LastPosition)`. |
 | `bool operator==(const BasicCsvTable<CharT> &_csvtable) noexcept`<p></p>`bool operator!=(const BasicCsvTable<CharT> &_csvtable) noexcept`<p></p>`bool operator<(const BasicCsvTable<CharT> &_csvtable) noexcept`<p></p>`bool operator<=(const BasicCsvTable<CharT> &_csvtable) noexcept`<p></p>`bool operator>(const BasicCsvTable<CharT> &_csvtable) noexcept`<p></p>`bool operator>=(const BasicCsvTable<CharT> &_csvtable) noexcept` | Used to compare tables.                                      |
-| `void sort()` <p></p> `void sort(const CsvSortList &_SortList)` | Sort all the rows except header(if header exists).           |
+| `void sort(const CsvSortList &_SortList = CsvSortList())`    | Sort all the rows except header(if header exists). Sort method can be defined by setting `CsvSortList` |
 | `bool find(const std::basic_string<CharT> &_TargetStr, CsvTablePos &_TablePos, const CsvRange &_Range)`<p></p>`bool find(const std::basic_string<CharT> &_TargetStr, CsvTablePos &_TablePos)` | Used to find a specified string in the table. All found position will be recorded in `_TablePos`. Searching area can be setup by inputting a `CsvRange` variable, range setting of specialized object would be used as default. |
 | `IndexT find(const std::basic_string<CharT> &_TargetStr, const CsvRange &_Range)`<p></p>`IndexT find(const std::basic_string<CharT> &_TargetStr)` | Used to find a specified string in the table. Return the first row in which the string is found. `nIndex` would be return if not found. Searching area can be setup by inputting a `CsvRange` variable, range setting of specialized object would be used as default. |
 
@@ -360,8 +360,8 @@ This project is licensed under the terms of the MIT license.
 | v0.0.1  | Initial vesion.                                                                                                                                                                                                          |
 | v0.0.2  | Reading rules of `Format(CsvFomat _format)` modified.                                                                                                                                                                    |
 | v0.1.0  | Templatized the classes.                                                                                                                                                                                                 |
-| v0.1.1  | Erased explicit call for detors of `std::vector()::~vector()` in BasicCsvRow and BasicCsvTable                                                                                                                           |
-| v0.1.2  | Delete empty rows.<p></p>Made value of CsvFormat in all rows change after change of CsvFormat in BasicCsvTable.<p></p>Trim or fill new rows if the size of the new rows are not equal to the header.                     |
+| v0.1.1  | Erased explicit call for desructor of `std::vector()::~vector()` in `BasicCsvRow `and `BasicCsvTable`                                                                                                               |
+| v0.1.2  | Delete empty rows.<p></p>Made value of `CsvFormat` in all rows change after change of `CsvFormat` in `BasicCsvTable`.<p></p>Trim or fill new rows if the size of the new rows are not equal to the header.               |
 | v0.2.0  | Complete the modifiers(insert，emplace，erase，push_back，emplace_back)                                                                                                                                                  |
 | v0.2.1  | Rewrote some of constructors.                                                                                                                                                                                            |
 | v0.2.2  | Add `swap()` and `RowSwap()` function.                                                                                                                                                                                   |
@@ -369,11 +369,11 @@ This project is licensed under the terms of the MIT license.
 | v0.2.4  | Add `NewRow()` function.                                                                                                                                                                                                 |
 | v0.2.5  | Fixed unable to call `BasicCsvRow.operator[](size_t index)` problem.                                                                                                                                                     |
 | v0.2.6  | Simplified the reading codes. Fixed problems。                                                                                                                                                                           |
-| v0.3.0  | Add BasicCsvColomn class to represent columns。                                                                                                                                                                          |
+| v0.3.0  | Add `BasicCsvColumn` class to represent columns。                                                                                                                                                                       |
 | v0.3.1  | Bugfix: Fixed the problem that a whole row might be erase after row read. <p></p>Fixed the problem that ` BasicCsvRow<CharT>::operator[]()` might be recursively called.                                                 |
 | v0.3.2  | Modified code to pass GCC compilation.                                                                                                                                                                                   |
-| v0.3.3  | Bugfix: Fixed the problem that program was haulted if a row ended with `\"`.<p></p>Modified `BasicCsvRow<CharT>::operator[]()`，an exception `std::invalid_argument` would be throw when the header input was not found. |
-| v0.4.0  | Comparision operator added. Sorting method `BasicCsvTable::sort()` addded.                                                                                                                                               |
+| v0.3.3  | Bugfix: Fixed the problem that program was halted if a row ended with `\"`.<p></p>Modified `BasicCsvRow<CharT>::operator[]()`，an exception `std::invalid_argument` would be throw when the header input was not found. |
+| v0.4.0  | Comparison operator added. Sorting method `BasicCsvTable::sort()` added.                                                                                                                                |
 | v0.4.1  | Bugfix: Fixed some problem.                                                                                                                                                                                              |
 | v0.4.2  | Minor changes.                                                                                                                                                                                                           |
 | v0.4.3 | Bugfix: Fixed problems of `insert` function. |
@@ -383,3 +383,4 @@ This project is licensed under the terms of the MIT license.
 |  v0.6.0 | Function add: `find()` (only return existed or not result) function is added. <p></p>Bugfix: Fixed problems of `sort()`. |
 | v0.6.1 | Bugfix: Fixed problems of `find()` function. |
 | v0.6.2 | Function modified: `find()`, returns the first position at which the target string found |
+| v0.6.3 | Function modified: `sort()`, use default constructor of `CsvSortList` as default parameter. |
